@@ -48,46 +48,18 @@ export const Header = ({
         </div>
 
         {/* ============================================================== */}
-        {/* CENTRO (EN MEDIO): HYDRO + [Logo_sin_letras_sin_fondo] + HOME  */}
+        {/* CENTRO (EN MEDIO): LOGO OFICIAL HYDRO HOME                     */}
         {/* ============================================================== */}
-        <div className="justify-self-center flex items-center justify-center gap-1.5 sm:gap-3 min-w-0 select-none">
-          <span
-            className={`font-black text-base sm:text-2xl tracking-wider transition-colors ${
-              isDark ? 'text-white' : 'text-slate-900'
-            }`}
-          >
-            HYDRO
-          </span>
-
-          <div
-            className={`w-10 h-10 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center p-1 sm:p-1.5 transition-all shrink-0 ${
-              isDark
-                ? 'bg-sky-500/15 border border-sky-400/40 shadow-[0_0_18px_rgba(56,189,248,0.3)]'
-                : 'bg-sky-50 border border-sky-200/90 shadow-xs'
-            }`}
-          >
-            <img
-              src="/assets/images/Logo_sin_letras_sin_fondo.png"
-              alt="Logo Hydro"
-              className={`w-full h-full object-contain transition-all ${
-                isDark
-                  ? 'drop-shadow-[0_0_8px_rgba(56,189,248,0.75)] brightness-110'
-                  : 'drop-shadow-[0_2px_5px_rgba(2,132,199,0.3)] contrast-125'
-              }`}
-              onError={(e) => {
-                e.currentTarget.onerror = null;
-                e.currentTarget.src = '/assets/images/Logo_sin_letras_sin_fondo.jpeg';
-              }}
-            />
-          </div>
-
-          <span
-            className={`font-black text-base sm:text-2xl tracking-wider transition-colors ${
-              isDark ? 'text-sky-400' : 'text-sky-600'
-            }`}
-          >
-            HOME
-          </span>
+        <div className="justify-self-center flex items-center justify-center min-w-0 select-none h-10 sm:h-12 px-2">
+          <img
+            src={isDark ? '/assets/images/Home_white.png' : '/assets/images/Home.png'}
+            alt="Hydro Home"
+            className="h-7 sm:h-8.5 w-auto object-contain filter drop-shadow-[0_0_10px_rgba(56,189,248,0.4)] transition-all"
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = '/assets/images/Home.png';
+            }}
+          />
         </div>
 
         {/* ============================================================== */}

@@ -124,12 +124,12 @@ export const SplashScreen = ({ onFinish }) => {
 
           <div className="w-64 sm:w-80 h-24 sm:h-28 rounded-3xl p-3.5 bg-[#061524] border-2 border-cyan-400/70 shadow-[0_0_65px_rgba(6,182,212,0.55)] backdrop-blur-md flex items-center justify-center overflow-hidden">
             <img
-              src="/assets/images/logo_principal_white.png"
+              src="/assets/images/Home_white.png"
               alt="Hydro Home"
               className="w-full h-full object-contain filter drop-shadow-[0_0_16px_rgba(56,189,248,0.85)]"
               onError={(e) => {
                 e.currentTarget.onerror = null;
-                e.currentTarget.src = '/assets/images/logo_principal.png';
+                e.currentTarget.src = '/assets/images/Home.png';
               }}
             />
           </div>
