@@ -6,11 +6,12 @@ import {
   EyeOff,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { WaterParticles } from '../components/common/WaterParticles';
 
 export const LoginScreen = ({ onLoginSuccess }) => {
   const { login, registerUser } = useAuth();
 
-  // Estados de vista: 'welcome' | 'login' | 'register' (idéntico al diseño de Figma)
+  // Estados de vista: 'welcome' | 'login' | 'register'
   const [view, setView] = useState('welcome');
 
   // Campos de inicio de sesión
@@ -99,8 +100,8 @@ export const LoginScreen = ({ onLoginSuccess }) => {
     }, 450);
   };
 
-  // Botón Google: Iniciar sesión con Cuenta de Prueba (Familia Vásquez)
-  const handleGoogleLogin = () => {
+  // Iniciar sesión con Cuenta de Prueba
+  const handleQuickDemoLogin = () => {
     setError('');
     setEmail('prueba@hydrohome.io');
     setPassword('Prueba#2024');
@@ -117,8 +118,8 @@ export const LoginScreen = ({ onLoginSuccess }) => {
     }, 300);
   };
 
-  // Botón Meta: Iniciar sesión con Cuenta de Administrador (Admin Hydro)
-  const handleMetaLogin = () => {
+  // Iniciar sesión con Cuenta de Administrador
+  const handleQuickAdminLogin = () => {
     setError('');
     setEmail('admin@hydrohome.io');
     setPassword('Admin#2024');
@@ -135,378 +136,358 @@ export const LoginScreen = ({ onLoginSuccess }) => {
     }, 300);
   };
 
+  // Clases reutilizables para mantener consistencia visual
+  const inputClass =
+    'w-full h-14 px-5 rounded-2xl text-base sm:text-sm font-medium bg-slate-900/60 text-white placeholder:text-slate-400 border border-slate-700/60 focus:border-cyan-400 focus:bg-slate-900/80 backdrop-blur-md focus:outline-none transition shadow-inner';
+  const primaryBtnClass =
+    'w-full h-14 rounded-2xl font-bold text-base sm:text-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-500/25 active:scale-98 transition cursor-pointer flex items-center justify-center text-center tracking-wide shrink-0';
+  const quickBtnClass =
+    'w-full h-13.5 px-5 rounded-2xl bg-slate-900/80 hover:bg-slate-800 text-slate-200 border border-slate-700/70 font-semibold text-sm backdrop-blur-md shadow-sm flex items-center justify-center transition cursor-pointer active:scale-98';
+  const backBtnClass =
+    'w-12 h-12 rounded-full flex items-center justify-center text-white bg-white/15 hover:bg-white/25 border border-white/25 backdrop-blur-md shadow-lg shadow-black/30 transition cursor-pointer active:scale-95';
+
+  // Animación común de entrada/salida de cada vista
+  const viewMotion = {
+    initial: { opacity: 0, y: 12 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -12 },
+    transition: { duration: 0.28, ease: 'easeOut' },
+  };
+
   return (
-    <div className="min-h-dvh w-full bg-[#050B14] text-slate-100 flex items-center justify-center p-0 sm:p-4 select-none relative overflow-x-hidden">
+    <div className="min-h-dvh w-full bg-[#050B14] text-slate-100 flex flex-col items-center px-6 select-none relative overflow-x-hidden">
       {/* Resplandor ambiental de fondo */}
       <div className="fixed -top-32 -left-32 w-[440px] h-[440px] rounded-full bg-cyan-600/15 blur-[120px] pointer-events-none" />
       <div className="fixed -bottom-32 -right-32 w-[440px] h-[440px] rounded-full bg-sky-500/15 blur-[120px] pointer-events-none" />
 
-      {/* Frame de teléfono/móvil: adaptativo a cualquier pantalla conservando la distribución exacta de Figma */}
-      <div className="relative z-10 w-full max-w-[420px] h-dvh sm:h-[844px] sm:max-h-[96dvh] bg-[#11141D] sm:rounded-[48px] sm:border-[8px] sm:border-slate-800 shadow-[0_25px_70px_rgba(0,0,0,0.95)] overflow-hidden flex flex-col justify-between">
+      {/* tsParticles: fondo fijo absoluto a pantalla completa */}
+      <WaterParticles className="absolute inset-0 z-0 pointer-events-none" />
+
+      {/*
+        Contenedor principal a altura completa de pantalla.
+        Cada vista reparte sus bloques con espaciadores flexibles proporcionales,
+        así los elementos ocupan su zona (arriba / centro / 3/4) en cualquier altura
+        y en pantallas bajas se respetan mínimos y aparece scroll natural.
+      */}
+      <div className="relative z-10 w-full max-w-sm mx-auto min-h-dvh flex flex-col">
         <AnimatePresence mode="wait">
           {/* ============================================================== */}
-          {/* PANTALLA 1: BIENVENIDOS (IMAGEN 1 DE FIGMA)                    */}
+          {/* VISTA 1: INICIO / BIENVENIDA (HOME / WELCOME)                  */}
           {/* ============================================================== */}
           {view === 'welcome' && (
             <motion.div
               key="welcome-view"
-              initial={{ opacity: 0, x: -16 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -16 }}
-              transition={{ duration: 0.24, ease: 'easeOut' }}
-              className="w-full h-full flex flex-col justify-between"
+              {...viewMotion}
+              className="w-full flex-1 flex flex-col items-center text-center py-8"
             >
-              {/* Parte superior oscura (~52% de la altura): Logo Home y Eslogan */}
-              <div className="h-[52%] flex flex-col items-center justify-center px-6 text-center pt-8 pb-4 relative">
-                {/* Logo Oficial Home */}
-                <div className="w-64 sm:w-72 h-auto max-h-24 flex items-center justify-center mb-6">
-                  <img
-                    src="/assets/images/Home_white.png"
-                    alt="Hydro Home"
-                    className="w-full h-auto max-h-20 object-contain filter drop-shadow-[0_0_18px_rgba(56,189,248,0.55)]"
-                    onError={(e) => {
-                      e.currentTarget.onerror = null;
-                      e.currentTarget.src = '/assets/images/Home.png';
-                    }}
-                  />
-                </div>
+              {/* Espaciador superior corto: el logo queda más arriba */}
+              <div className="flex-[0.55] min-h-6" />
 
-                {/* Eslogan sobre la curva de la tarjeta */}
-                <p className="text-xs sm:text-sm text-slate-300 font-medium max-w-[280px] leading-relaxed tracking-wide text-center">
-                  Capture and share the world's moment
-                </p>
+              {/* Logotipo Oficial: un poco más grande */}
+              <div className="w-[380px] sm:w-[440px] max-w-full flex items-center justify-center shrink-0">
+                <img
+                  src="/assets/images/Home_white.png"
+                  alt="Hydro Home"
+                  className="w-full h-auto max-h-40 object-contain filter drop-shadow-[0_0_30px_rgba(56,189,248,0.7)]"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = '/assets/images/Home.png';
+                  }}
+                />
               </div>
 
-              {/* Tarjeta inferior curva (~48% de la altura) con 'Bienvenidos' */}
-              <div className="h-[48%] w-full bg-[#B9CBD9] text-slate-900 rounded-t-[48px] px-8 pt-9 pb-12 shadow-[0_-15px_40px_rgba(0,0,0,0.35)] flex flex-col justify-center">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-[#232938] mb-8 text-left tracking-tight">
-                  Bienvenidos
-                </h1>
+              {/* Espaciador logo → título */}
+              <div className="flex-1 min-h-10" />
 
-                <div className="flex flex-col gap-4">
-                  {/* Botón Ingresar */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setView('login');
-                      setError('');
-                    }}
-                    className="w-full h-14 rounded-full font-bold text-base bg-[#2E2E44] hover:bg-[#232338] text-white shadow-lg shadow-[#2E2E44]/35 active:scale-98 transition cursor-pointer flex items-center justify-center text-center tracking-wide"
-                  >
-                    Ingresar
-                  </button>
+              {/* Título Bienvenidos: más grande y en el centro de la pantalla */}
+              <h1 className="text-[2.75rem] sm:text-6xl leading-none font-extrabold text-white tracking-tight drop-shadow-md shrink-0">
+                Bienvenidos
+              </h1>
 
-                  {/* Botón Crear */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setView('register');
-                      setError('');
-                    }}
-                    className="w-full h-14 rounded-full font-bold text-base bg-white hover:bg-slate-50 text-[#232938] shadow-md shadow-black/10 active:scale-98 transition cursor-pointer flex items-center justify-center text-center tracking-wide"
-                  >
-                    Crear
-                  </button>
-                </div>
+              {/* Espaciador título → botones (simétrico al de arriba para centrar el título) */}
+              <div className="flex-1 min-h-12" />
+
+              {/* Bloque de botones: más abajo */}
+              <div className="w-full flex flex-col gap-4.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setView('login');
+                    setError('');
+                  }}
+                  className={primaryBtnClass}
+                >
+                  Ingresar
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setView('register');
+                    setError('');
+                  }}
+                  className="w-full h-14 rounded-2xl font-bold text-base sm:text-lg bg-slate-900/80 hover:bg-slate-800 text-white border border-slate-700/80 backdrop-blur-md shadow-md active:scale-98 transition cursor-pointer flex items-center justify-center text-center tracking-wide"
+                >
+                  Crear Cuenta
+                </button>
               </div>
+
+              {/* Espaciador inferior corto: botones cerca de la zona baja */}
+              <div className="flex-[0.55] min-h-6" />
             </motion.div>
           )}
 
           {/* ============================================================== */}
-          {/* PANTALLA 2: WELCOME BACK (IMAGEN 2 DE FIGMA)                   */}
+          {/* VISTA 2: INICIAR SESIÓN (LOGIN)                                */}
           {/* ============================================================== */}
           {view === 'login' && (
             <motion.div
               key="login-view"
-              initial={{ opacity: 0, x: 16 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -16 }}
-              transition={{ duration: 0.24, ease: 'easeOut' }}
-              className="w-full h-full flex flex-col justify-between"
+              {...viewMotion}
+              className="w-full flex-1 flex flex-col py-8"
             >
-              {/* Parte superior oscura (~34% de la altura): Flecha atrás, título y subtítulo alineados a la izquierda */}
-              <div className="h-[34%] min-h-[160px] max-h-[220px] px-7 pt-8 pb-4 flex flex-col justify-between shrink-0">
+              {/* Botón de regresar: separado del borde superior (mt considerable) */}
+              <div className="w-full flex items-center mt-6 sm:mt-10 shrink-0">
                 <button
                   type="button"
                   onClick={() => {
                     setView('welcome');
                     setError('');
                   }}
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition cursor-pointer -ml-2"
+                  className={backBtnClass}
                   title="Volver"
                 >
-                  <ArrowLeft className="w-6 h-6" />
+                  <ArrowLeft className="w-5 h-5 text-white stroke-[2.5]" />
                 </button>
-
-                <div className="mb-2">
-                  <h2 className="text-3xl sm:text-4xl font-extrabold text-white text-left tracking-tight">
-                    Welcome back
-                  </h2>
-                  <p className="text-xs sm:text-sm text-slate-300/85 text-left mt-1 font-medium leading-relaxed max-w-[320px]">
-                    Please enter your account details to sign in your account
-                  </p>
-                </div>
               </div>
 
-              {/* Tarjeta inferior curva (~66% de la altura): Inputs, divisor y botones sociales */}
-              <div className="h-[66%] flex-1 w-full bg-[#B9CBD9] text-slate-900 rounded-t-[48px] px-7 sm:px-8 pt-7 pb-8 shadow-[0_-15px_40px_rgba(0,0,0,0.35)] flex flex-col justify-between overflow-y-auto">
-                <form onSubmit={handleLogin} className="flex flex-col">
-                  {error && (
-                    <div className="mb-3 p-3 rounded-2xl bg-rose-500/20 border border-rose-500/40 text-rose-900 text-xs font-bold text-left animate-fadeIn">
-                      ⚠️ {error}
-                    </div>
-                  )}
+              {/* Cabecera: acompaña al botón de regresar en la parte alta */}
+              <div className="w-full text-center mt-6 shrink-0">
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+                  Bienvenido de nuevo
+                </h2>
+                <p className="text-sm text-slate-400 mt-2 font-medium leading-relaxed">
+                  Ingresa los datos de tu cuenta para continuar
+                </p>
+              </div>
 
-                  {/* Input Usuario */}
-                  <div className="mb-3.5">
-                    <input
-                      type="text"
-                      required
-                      placeholder="Usuario"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full h-13 px-6 rounded-full text-sm font-semibold bg-[#EEF2F6] text-slate-900 placeholder:text-slate-500 text-left border border-transparent focus:border-sky-500 focus:bg-white focus:outline-none transition shadow-sm"
-                    />
+              {/* Espaciador cabecera → formulario: aleja el formulario hacia abajo */}
+              <div className="flex-[0.8] min-h-10" />
+
+              {/* Formulario */}
+              <form onSubmit={handleLogin} className="w-full flex flex-col shrink-0">
+                {error && (
+                  <div className="mb-4 p-3 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-semibold text-center animate-fadeIn">
+                    ⚠️ {error}
                   </div>
+                )}
 
-                  {/* Input Contraseña */}
-                  <div className="relative mb-1.5">
+                {/* Campos más separados entre sí */}
+                <div className="flex flex-col gap-5">
+                  <input
+                    type="text"
+                    required
+                    placeholder="Usuario o Correo"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className={inputClass}
+                  />
+
+                  <div className="relative">
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
                       placeholder="Contraseña"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full h-13 pl-6 pr-12 rounded-full text-sm font-semibold bg-[#EEF2F6] text-slate-900 placeholder:text-slate-500 text-left border border-transparent focus:border-sky-500 focus:bg-white focus:outline-none transition shadow-sm"
+                      className={`${inputClass} pr-13`}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-800 transition cursor-pointer"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition cursor-pointer p-1.5"
                     >
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   </div>
-
-                  {/* Forgot Password? a la derecha */}
-                  <div className="flex justify-end mb-4">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEmail('prueba@hydrohome.io');
-                        setPassword('Prueba#2024');
-                      }}
-                      className="text-xs font-bold text-[#2E2E44] hover:text-black transition cursor-pointer"
-                    >
-                      Forgot Password?
-                    </button>
-                  </div>
-
-                  {/* Botón Ingresar */}
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full h-13.5 rounded-full font-bold text-base bg-[#2E2E44] hover:bg-[#232338] text-white shadow-lg shadow-[#2E2E44]/35 active:scale-98 transition cursor-pointer flex items-center justify-center text-center tracking-wide"
-                  >
-                    {isLoading ? (
-                      <span className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full" />
-                    ) : (
-                      'Ingresar'
-                    )}
-                  </button>
-                </form>
-
-                {/* Divisor horizontal tenue */}
-                <div className="w-full border-t border-[#9CB0C2] my-4" />
-
-                {/* Botones Sociales tal cual Figma: Continue with Google y Continue with meta */}
-                <div className="flex flex-col gap-3">
-                  {/* Botón 1: Google (conecta con cuenta demo) */}
-                  <button
-                    type="button"
-                    onClick={handleGoogleLogin}
-                    className="w-full h-13 px-6 rounded-full bg-white hover:bg-slate-50 text-[#232938] font-bold text-sm shadow-sm flex items-center justify-center gap-3 transition cursor-pointer active:scale-98 border border-white"
-                  >
-                    <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
-                      <path
-                        fill="#4285F4"
-                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                      />
-                      <path
-                        fill="#34A853"
-                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                      />
-                      <path
-                        fill="#FBBC05"
-                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                      />
-                      <path
-                        fill="#EA4335"
-                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                      />
-                    </svg>
-                    <span>Continue with Google</span>
-                  </button>
-
-                  {/* Botón 2: Meta (conecta con cuenta admin) */}
-                  <button
-                    type="button"
-                    onClick={handleMetaLogin}
-                    className="w-full h-13 px-6 rounded-full bg-white hover:bg-slate-50 text-[#232938] font-bold text-sm shadow-sm flex items-center justify-center gap-3 transition cursor-pointer active:scale-98 border border-white"
-                  >
-                    <svg className="w-5 h-5 text-[#0081FB] shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M16.92 6C14.7 6 12.98 7.4 12 9.06 11.02 7.4 9.3 6 7.08 6 3.73 6 1 8.85 1 12.38c0 3.93 3.2 7.62 6.18 7.62 2.1 0 3.75-1.31 4.82-2.94 1.07 1.63 2.72 2.94 4.82 2.94 2.98 0 6.18-3.69 6.18-7.62C23 8.85 20.27 6 16.92 6zm-9.84 11.5c-2.3 0-4.58-3.05-4.58-5.12 0-2.23 1.76-3.88 3.88-3.88 1.95 0 3.45 1.48 4.2 3.28-.9 2.45-2.14 5.72-3.5 5.72zm9.84 0c-1.36 0-2.6-3.27-3.5-5.72.75-1.8 2.25-3.28 4.2-3.28 2.12 0 3.88 1.65 3.88 3.88 0 2.07-2.28 5.12-4.58 5.12z" />
-                    </svg>
-                    <span>Continue with meta</span>
-                  </button>
                 </div>
+
+                {/* Botón Ingresar: claramente separado de los recuadros */}
+                <button type="submit" disabled={isLoading} className={`${primaryBtnClass} mt-9`}>
+                  {isLoading ? (
+                    <span className="animate-spin w-5 h-5 border-2 border-slate-950 border-t-transparent rounded-full" />
+                  ) : (
+                    'Ingresar'
+                  )}
+                </button>
+              </form>
+
+              {/* Espaciador simétrico: el divisor queda justo en medio */}
+              <div className="flex-1 min-h-9" />
+
+              {/* Divisor "o acceso rápido" */}
+              <div className="w-full flex items-center justify-center shrink-0">
+                <div className="flex-1 border-t border-slate-700/60" />
+                <span className="px-4 text-xs font-semibold text-slate-400 tracking-wider uppercase">
+                  o acceso rápido
+                </span>
+                <div className="flex-1 border-t border-slate-700/60" />
               </div>
+
+              <div className="flex-1 min-h-9" />
+
+              {/* Botones de acceso rápido: hacia los 3/4 inferiores */}
+              <div className="w-full flex flex-col gap-4 shrink-0">
+                <button type="button" onClick={handleQuickDemoLogin} className={quickBtnClass}>
+                  Cuenta de Prueba
+                </button>
+                <button type="button" onClick={handleQuickAdminLogin} className={quickBtnClass}>
+                  Cuenta de Administrador
+                </button>
+              </div>
+
+              {/* Margen inferior proporcional */}
+              <div className="flex-[0.45] min-h-6" />
             </motion.div>
           )}
 
           {/* ============================================================== */}
-          {/* PANTALLA 3: GET STARTED (IMAGEN 3 DE FIGMA)                    */}
+          {/* VISTA 3: CREAR CUENTA (REGISTRO)                               */}
           {/* ============================================================== */}
           {view === 'register' && (
             <motion.div
               key="register-view"
-              initial={{ opacity: 0, x: 16 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -16 }}
-              transition={{ duration: 0.24, ease: 'easeOut' }}
-              className="w-full h-full flex flex-col justify-between"
+              {...viewMotion}
+              className="w-full flex-1 flex flex-col py-8"
             >
-              {/* Parte superior oscura (~26% de la altura): Flecha, título y subtítulo */}
-              <div className="h-[26%] min-h-[140px] max-h-[190px] px-7 pt-6 pb-3 flex flex-col justify-between shrink-0">
+              {/* Botón de regresar: mismo margen superior que en Login */}
+              <div className="w-full flex items-center mt-6 sm:mt-10 shrink-0">
                 <button
                   type="button"
                   onClick={() => {
                     setView('welcome');
                     setError('');
                   }}
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition cursor-pointer -ml-2"
+                  className={backBtnClass}
                   title="Volver"
                 >
-                  <ArrowLeft className="w-6 h-6" />
+                  <ArrowLeft className="w-5 h-5 text-white stroke-[2.5]" />
                 </button>
-
-                <div className="mb-1">
-                  <h2 className="text-3xl sm:text-4xl font-extrabold text-white text-left tracking-tight">
-                    Get Started
-                  </h2>
-                  <p className="text-xs sm:text-sm text-slate-300/85 text-left mt-0.5 font-medium leading-relaxed max-w-[320px]">
-                    Please enter your detail to create an account
-                  </p>
-                </div>
               </div>
 
-              {/* Tarjeta inferior curva (~74% de la altura): 4 campos, términos y botón */}
-              <div className="h-[74%] flex-1 w-full bg-[#B9CBD9] text-slate-900 rounded-t-[48px] px-7 sm:px-8 pt-6 pb-6 flex flex-col justify-between overflow-y-auto">
-                <form onSubmit={handleRegister} className="flex flex-col">
-                  {error && (
-                    <div className="mb-2 p-2.5 rounded-2xl bg-rose-500/20 border border-rose-500/40 text-rose-900 text-xs font-bold text-left animate-fadeIn">
-                      ⚠️ {error}
-                    </div>
-                  )}
+              {/* Título Crear Cuenta: un poco más arriba (pegado al flujo del botón) */}
+              <div className="w-full text-center mt-5 shrink-0">
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+                  Crear Cuenta
+                </h2>
+                <p className="text-sm text-slate-400 mt-2 font-medium leading-relaxed">
+                  Ingresa tus datos para registrarte
+                </p>
+              </div>
 
-                  {/* Input Nombre de Usuario */}
-                  <div className="mb-2.5">
-                    <input
-                      type="text"
-                      required
-                      placeholder="Nombre de Usuario"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      className="w-full h-12 px-6 rounded-full text-sm font-semibold bg-[#EEF2F6] text-slate-900 placeholder:text-slate-500 text-left border border-transparent focus:border-sky-500 focus:bg-white focus:outline-none transition shadow-sm"
-                    />
+              {/* Espaciador cabecera → campos: baja el bloque de recuadros */}
+              <div className="flex-[0.7] min-h-8" />
+
+              <form onSubmit={handleRegister} className="w-full flex-[3] flex flex-col">
+                {error && (
+                  <div className="mb-4 p-3 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-semibold text-center animate-fadeIn shrink-0">
+                    ⚠️ {error}
                   </div>
+                )}
 
-                  {/* Input Email */}
-                  <div className="mb-2.5">
-                    <input
-                      type="email"
-                      required
-                      placeholder="Email"
-                      value={registerEmail}
-                      onChange={(e) => setRegisterEmail(e.target.value)}
-                      className="w-full h-12 px-6 rounded-full text-sm font-semibold bg-[#EEF2F6] text-slate-900 placeholder:text-slate-500 text-left border border-transparent focus:border-sky-500 focus:bg-white focus:outline-none transition shadow-sm"
-                    />
-                  </div>
+                {/* 4 campos con separación uniforme */}
+                <div className="flex flex-col gap-4.5 shrink-0">
+                  <input
+                    type="text"
+                    required
+                    placeholder="Nombre de Usuario"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className={inputClass}
+                  />
 
-                  {/* Input Contraseña */}
-                  <div className="relative mb-2.5">
+                  <input
+                    type="email"
+                    required
+                    placeholder="Correo Electrónico"
+                    value={registerEmail}
+                    onChange={(e) => setRegisterEmail(e.target.value)}
+                    className={inputClass}
+                  />
+
+                  <div className="relative">
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
                       placeholder="Contraseña"
                       value={registerPassword}
                       onChange={(e) => setRegisterPassword(e.target.value)}
-                      className="w-full h-12 pl-6 pr-12 rounded-full text-sm font-semibold bg-[#EEF2F6] text-slate-900 placeholder:text-slate-500 text-left border border-transparent focus:border-sky-500 focus:bg-white focus:outline-none transition shadow-sm"
+                      className={`${inputClass} pr-13`}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-800 transition cursor-pointer"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition cursor-pointer p-1.5"
                     >
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   </div>
 
-                  {/* Input Confirmar Contraseña */}
-                  <div className="mb-3">
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      required
-                      placeholder="Confirmar Contraseña"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full h-12 px-6 rounded-full text-sm font-semibold bg-[#EEF2F6] text-slate-900 placeholder:text-slate-500 text-left border border-transparent focus:border-sky-500 focus:bg-white focus:outline-none transition shadow-sm"
-                    />
-                  </div>
-
-                  {/* Checkbox Terms and Privacy */}
-                  <div className="flex items-center gap-2.5 px-1 mb-3.5">
-                    <input
-                      type="checkbox"
-                      id="terms"
-                      checked={agreeTerms}
-                      onChange={(e) => setAgreeTerms(e.target.checked)}
-                      className="w-4 h-4 rounded-md border-slate-400 bg-[#EEF2F6] text-[#2E2E44] focus:ring-0 cursor-pointer"
-                    />
-                    <label htmlFor="terms" className="text-xs font-semibold text-slate-700 cursor-pointer select-none">
-                      I agree with <span className="text-sky-700 font-bold">Terms</span> and{' '}
-                      <span className="text-sky-700 font-bold">Privacy</span>
-                    </label>
-                  </div>
-
-                  {/* Botón Ingresar */}
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full h-13 rounded-full font-bold text-base bg-[#2E2E44] hover:bg-[#232338] text-white shadow-lg shadow-[#2E2E44]/35 active:scale-98 transition cursor-pointer flex items-center justify-center text-center tracking-wide mb-2"
-                  >
-                    {isLoading ? (
-                      <span className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full" />
-                    ) : (
-                      'Ingresar'
-                    )}
-                  </button>
-                </form>
-
-                {/* Alternador inferior */}
-                <div className="text-center pt-1">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setView('login');
-                      setError('');
-                    }}
-                    className="text-xs font-bold text-[#2E2E44] hover:text-black transition cursor-pointer"
-                  >
-                    ¿Ya tienes una cuenta? <span className="underline">Inicia sesión</span>
-                  </button>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    placeholder="Confirmar Contraseña"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className={inputClass}
+                  />
                 </div>
+
+                {/* Espaciadores iguales arriba y abajo: la casilla queda justo en medio */}
+                <div className="flex-1 min-h-7" />
+
+                <div className="flex items-center justify-center gap-2.5 px-1 shrink-0">
+                  <input
+                    type="checkbox"
+                    id="terms"
+                    checked={agreeTerms}
+                    onChange={(e) => setAgreeTerms(e.target.checked)}
+                    className="w-4.5 h-4.5 rounded-md border-slate-700 bg-slate-900/70 text-cyan-500 focus:ring-0 cursor-pointer accent-cyan-500"
+                  />
+                  <label htmlFor="terms" className="text-sm font-medium text-slate-300 cursor-pointer select-none">
+                    Acepto los <span className="text-cyan-400 font-semibold underline">Términos</span> y la{' '}
+                    <span className="text-cyan-400 font-semibold underline">Privacidad</span>
+                  </label>
+                </div>
+
+                <div className="flex-1 min-h-7" />
+
+                {/* Botón Crear Cuenta: hacia los 3/4 de la pantalla */}
+                <button type="submit" disabled={isLoading} className={primaryBtnClass}>
+                  {isLoading ? (
+                    <span className="animate-spin w-5 h-5 border-2 border-slate-950 border-t-transparent rounded-full" />
+                  ) : (
+                    'Crear Cuenta'
+                  )}
+                </button>
+              </form>
+
+              {/* Enlace inferior con su propio margen */}
+              <div className="w-full text-center mt-7 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setView('login');
+                    setError('');
+                  }}
+                  className="text-sm font-medium text-slate-400 hover:text-slate-200 transition cursor-pointer"
+                >
+                  ¿Ya tienes una cuenta? <span className="text-cyan-400 font-semibold underline ml-1">Inicia sesión</span>
+                </button>
               </div>
+
+              {/* Margen inferior proporcional */}
+              <div className="flex-[0.4] min-h-6" />
             </motion.div>
           )}
         </AnimatePresence>
