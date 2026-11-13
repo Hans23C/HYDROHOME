@@ -23,10 +23,35 @@ export const BarraNavegacion = ({
     ? 'sticky bottom-0 left-0 right-0 z-30'
     : 'fixed bottom-0 left-0 right-0 z-40';
 
+  const cx = activeTab * 100 + 50;
+  const notchPath = `M 0 28 L ${cx - 48} 28 C ${cx - 28} 28, ${cx - 24} 2, ${cx} 2 C ${cx + 24} 2, ${cx + 28} 28, ${cx + 48} 28 L 400 28 L 400 100 L 0 100 Z`;
+
   return (
-    <div className={`${wrapperClass} ${className} w-full m-0 p-0 select-none`}>
-      <div className="relative w-full bg-[linear-gradient(90deg,#505DD0_0%,#000000_50%,#505DD0_100%)] text-white pt-3 pb-[max(1.25rem,env(safe-area-inset-bottom))] px-3 shadow-[0_-8px_24px_rgba(0,0,0,0.35)]">
-        <div className="flex items-center justify-around relative">
+    <div className={`${wrapperClass} ${className} w-full m-0 p-0 bg-transparent select-none`}>
+      <div className="relative w-full text-white pt-7 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        {/* Fondo SVG con curva envolvente animada y degradado lineal exacto */}
+        <svg
+          viewBox="0 0 400 100"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full pointer-events-none drop-shadow-[0_-6px_14px_rgba(0,0,0,0.3)]"
+        >
+          <defs>
+            <linearGradient id="hydroNavGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#505DD0" />
+              <stop offset="50%" stopColor="#000000" />
+              <stop offset="100%" stopColor="#505DD0" />
+            </linearGradient>
+          </defs>
+          <motion.path
+            d={notchPath}
+            animate={{ d: notchPath }}
+            transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+            fill="url(#hydroNavGradient)"
+          />
+        </svg>
+
+        <div className="flex items-center justify-around relative z-10">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -39,10 +64,13 @@ export const BarraNavegacion = ({
               >
                 {isActive ? (
                   <div className="relative flex flex-col items-center">
-                    {/* Botón flotante en notch blanco con icono naranja */}
+                    {/* Botón flotante sobresaliendo dentro de la curva */}
                     <motion.div
                       layoutId="activeNavNotch"
-                      className="w-14 h-14 -mt-8 rounded-full bg-white flex items-center justify-center shadow-lg shadow-black/40 border-2 border-white/25"
+                      initial={{ scale: 0.9, y: 4 }}
+                      animate={{ scale: 1.05, y: 0 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="w-13 h-13 -mt-7 rounded-full bg-white flex items-center justify-center shadow-lg shadow-black/40 border-2 border-white/25"
                       transition={{ type: 'spring', stiffness: 420, damping: 28 }}
                     >
                       <Icon className="w-6 h-6 text-[#FF5B22] stroke-[2.4]" />

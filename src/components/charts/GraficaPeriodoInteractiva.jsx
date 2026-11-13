@@ -1,29 +1,42 @@
 import React, { useState } from 'react';
 import { TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
 
-export const GraficaPeriodoInteractiva = ({ period = 'day', systemName = 'Casa Principal' }) => {
+export const GraficaPeriodoInteractiva = ({
+  period = 'day',
+  systemName = 'Casa Principal',
+  selectedDate,
+}) => {
   const [hoveredPoint, setHoveredPoint] = useState(null);
   const [rangeIndex, setRangeIndex] = useState(0); // Para filtros secundarios dentro del periodo
+
+  // Factor determinístico según la fecha seleccionada en el calendario para reflejar cambios dinámicos
+  const dateFactor = selectedDate
+    ? 0.85 + (((selectedDate.getDate() * 7 + selectedDate.getMonth() * 13) % 30) / 100)
+    : 1;
 
   // Datasets reales y calibrados según el periodo seleccionado (Día, Semana, Mes)
   const datasets = {
     day: {
       title: 'Consumo por Hora (Últimas 24h)',
       unit: 'L',
-      data: [8.2, 5.1, 3.4, 2.1, 4.0, 12.5, 24.8, 38.2, 28.4, 18.2, 14.5, 19.8, 22.4, 16.2, 14.8, 21.3, 26.5, 34.2, 42.1, 31.8, 24.2, 18.5, 12.4, 9.8],
+      data: [8.2, 5.1, 3.4, 2.1, 4.0, 12.5, 24.8, 38.2, 28.4, 18.2, 14.5, 19.8, 22.4, 16.2, 14.8, 21.3, 26.5, 34.2, 42.1, 31.8, 24.2, 18.5, 12.4, 9.8].map((v) =>
+        Number((v * dateFactor).toFixed(1))
+      ),
       labels: ['00h', '02h', '04h', '06h', '08h', '10h', '12h', '14h', '16h', '18h', '20h', '22h', '24h'],
       ranges: ['24H', '12H', '6H'],
       scaleY: { min: 0, max: 50, steps: [0, 15, 30, 45] },
-      costEstimate: '$12.50 MXN (Hoy)',
+      costEstimate: `$${(12.5 * dateFactor).toFixed(2)} MXN (Día)`,
     },
     week: {
-      title: 'Consumo Diario (Última Semana)',
+      title: 'Consumo Diario (Semana Seleccionada)',
       unit: 'm³',
-      data: [205.1, 218.4, 222.0, 230.5, 210.8, 232.1, 248.2],
+      data: [205.1, 218.4, 222.0, 230.5, 210.8, 232.1, 248.2].map((v) =>
+        Number((v * dateFactor).toFixed(1))
+      ),
       labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
       ranges: ['7D', '14D', '21D'],
-      scaleY: { min: 160, max: 280, steps: [180, 210, 240, 270] },
-      costEstimate: '$45.80 MXN (Esta Semana)',
+      scaleY: { min: 150, max: 300, steps: [180, 210, 240, 270] },
+      costEstimate: `$${(45.8 * dateFactor).toFixed(2)} MXN (Semana)`,
     },
     month: {
       title: 'Consumo Mensual Acumulado',
@@ -32,11 +45,11 @@ export const GraficaPeriodoInteractiva = ({ period = 'day', systemName = 'Casa P
         210.2, 215.4, 218.0, 225.1, 228.4, 235.2, 220.1, 214.5, 228.7, 241.2,
         219.6, 263.4, 248.9, 201.2, 235.7, 248.2, 230.1, 224.5, 218.9, 235.0,
         240.2, 245.1, 252.0, 238.4, 229.1, 242.0, 250.4, 255.1, 248.2, 252.8
-      ],
-      labels: ['01/11', '05/11', '10/11', '15/11', '20/11', '25/11', '30/11'],
+      ].map((v) => Number((v * dateFactor).toFixed(1))),
+      labels: ['01', '05', '10', '15', '20', '25', '30'],
       ranges: ['Mes Activo', 'Mes Anterior'],
-      scaleY: { min: 180, max: 280, steps: [190, 220, 250, 280] },
-      costEstimate: '$137.64 MXN (Est. Mensual)',
+      scaleY: { min: 150, max: 300, steps: [180, 220, 260, 300] },
+      costEstimate: `$${(137.64 * dateFactor).toFixed(2)} MXN (Mes)`,
     },
   };
 
@@ -146,12 +159,12 @@ export const GraficaPeriodoInteractiva = ({ period = 'day', systemName = 'Casa P
       <div className="relative w-full h-[175px]">
         <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`} className="w-full h-full overflow-visible">
           <defs>
-            <linearGradient id="corpAreaGrad" x1="0" y1="0" x2="0" y2="1">
+            <linearGradient id={`corpAreaGrad-${period}`} x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#00B4D8" stopOpacity="0.45" />
               <stop offset="70%" stopColor="#0077B6" stopOpacity="0.1" />
               <stop offset="100%" stopColor="#0077B6" stopOpacity="0" />
             </linearGradient>
-            <linearGradient id="corpLineGrad" x1="0" y1="0" x2="1" y2="0">
+            <linearGradient id={`corpLineGrad-${period}`} x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="#00C2FF" />
               <stop offset="50%" stopColor="#0284C7" />
               <stop offset="100%" stopColor="#0EA5E9" />
@@ -181,10 +194,10 @@ export const GraficaPeriodoInteractiva = ({ period = 'day', systemName = 'Casa P
           ))}
 
           {/* Área con relleno en gradiente */}
-          <path d={areaD} fill="url(#corpAreaGrad)" />
+          <path d={areaD} fill={`url(#corpAreaGrad-${period})`} />
 
           {/* Línea Principal del Gráfico */}
-          <path d={pathD} fill="none" stroke="url(#corpLineGrad)" strokeWidth="3" strokeLinecap="round" />
+          <path d={pathD} fill="none" stroke={`url(#corpLineGrad-${period})`} strokeWidth="3" strokeLinecap="round" />
 
           {/* Puntos de Datos y Picos */}
           {data.map((val, idx) => {

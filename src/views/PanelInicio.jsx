@@ -229,20 +229,7 @@ export const PanelInicio = ({
       </div>
 
       {/* ============================================================== */}
-      {/* 3. GRÁFICAS PRINCIPALES (SIEMPRE VISIBLES - SIN RECUADROS DOBLE)*/}
-      {/* ============================================================== */}
-      <div className="space-y-6">
-        <AnimacionNivelCisterna
-          initialLevel={cisternLevel}
-          capacity={cisternCapacity}
-          title={`Cisterna · ${activeSystem?.name || 'Residencia Central Admin'}`}
-        />
-
-        <AnimacionFlujoAgua initialFlowing={pumpActive && valveOpen} />
-      </div>
-
-      {/* ============================================================== */}
-      {/* 4. MÓDULOS DE GESTIÓN (ARRIBA DE LOS BANNERS DE ACCIÓN)        */}
+      {/* 3. MÓDULOS DE GESTIÓN (DEBAJO DE BOTONES SUPERIORES)           */}
       {/* ============================================================== */}
       <div className="pt-2">
         <h3 className="font-black text-base sm:text-lg text-slate-900 dark:text-white mb-4">
@@ -302,6 +289,19 @@ export const PanelInicio = ({
             </span>
           </div>
         </div>
+      </div>
+
+      {/* ============================================================== */}
+      {/* 4. GRÁFICAS PRINCIPALES (SIEMPRE VISIBLES - SIN RECUADROS DOBLE)*/}
+      {/* ============================================================== */}
+      <div className="space-y-6">
+        <AnimacionNivelCisterna
+          initialLevel={cisternLevel}
+          capacity={cisternCapacity}
+          title={`Cisterna · ${activeSystem?.name || 'Residencia Central Admin'}`}
+        />
+
+        <AnimacionFlujoAgua initialFlowing={pumpActive && valveOpen} />
       </div>
 
       {/* ============================================================== */}

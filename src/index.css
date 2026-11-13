@@ -530,3 +530,16 @@ html.dark .filter-pill-inactive {
   color: #94A3B8;
 }
 
+@keyframes hydro-glow-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-hydro-glow {
+  animation: hydro-glow-spin 3s linear infinite;
+}
+
