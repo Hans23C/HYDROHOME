@@ -17,7 +17,7 @@ export const Encabezado = ({
 
   return (
     <header
-      className={`sticky top-0 z-40 w-full bg-[radial-gradient(circle,#000000_0%,#505DD0_100%)] text-white px-5 sm:px-6 py-5 flex items-center justify-between min-h-[84px] select-none transition-colors ${className}`}
+      className={`shrink-0 relative left-0 right-0 z-10 w-full m-0 bg-[linear-gradient(135deg,#0B192C_0%,#1E3A8A_100%)] dark:bg-[radial-gradient(circle,#000000_0%,#505DD0_100%)] text-white px-5 sm:px-6 pt-5 pb-9 flex items-center justify-between min-h-[104px] select-none transition-colors ${className}`}
     >
       {/* Botón Izquierdo: Back Arrow o Avatar de Usuario */}
       <div className="flex items-center">
@@ -51,7 +51,7 @@ export const Encabezado = ({
             <img
               src="/assets/images/Home_white.png"
               alt="Hydro Home"
-              className="h-8 sm:h-9 w-auto max-w-[170px] sm:max-w-[200px] object-contain drop-shadow"
+              className="h-8 sm:h-9 w-auto max-w-[170px] sm:max-w-[200px] object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.45)]"
               onError={(e) => {
                 // Fallback elegante en caso de ruta
                 e.currentTarget.style.display = 'none';
@@ -64,7 +64,7 @@ export const Encabezado = ({
                 <Droplets className="w-4 h-4 fill-current" />
               </div>
               <span className="font-black text-base sm:text-lg tracking-wider text-white">
-                HYDRO <span className="text-[#00C2FF]">HOME</span>
+                HYDRO <span className="text-cyan-200 dark:text-[#00C2FF]">HOME</span>
               </span>
             </div>
           </div>
@@ -81,7 +81,7 @@ export const Encabezado = ({
           >
             <Bell className="w-5.5 h-5.5 fill-white/10" />
             {hasUnseen && (
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-[#1E2022] animate-pulse" />
+              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-[#0284C7] dark:ring-[#1E2022] animate-pulse" />
             )}
           </button>
         ) : (

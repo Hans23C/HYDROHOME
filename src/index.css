@@ -58,6 +58,11 @@ html.dark,
   html {
     /* Ajuste equilibrado del tamaño de letra base */
     font-size: 16px;
+    width: 100%;
+    min-height: 100dvh;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
     scrollbar-width: none;
   }
 
@@ -69,11 +74,22 @@ html.dark,
     font-family: var(--font-sans);
     background-color: var(--bg-primary);
     color: var(--text-primary);
+    width: 100%;
     min-height: 100dvh;
+    margin: 0;
+    padding: 0;
     overflow-x: hidden;
     transition: background-color 0.25s ease, color 0.25s ease;
     line-height: 1.6;
     scrollbar-width: none;
+  }
+
+  #root {
+    width: 100%;
+    min-height: 100dvh;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
   }
 
   body::-webkit-scrollbar {

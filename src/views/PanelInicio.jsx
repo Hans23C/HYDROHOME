@@ -3,14 +3,11 @@ import { motion } from 'motion/react';
 import {
   Home as HomeIcon,
   Power,
-  Lock,
-  Unlock,
   FileText,
   Headphones,
   Wrench,
   ShieldCheck,
   Truck,
-  Bot,
   ArrowRight,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -20,13 +17,11 @@ import { AnimacionFlujoAgua } from '../components/animations/AnimacionFlujoAgua'
 export const PanelInicio = ({
   onNavigateToSystems,
   onNavigateToReports,
-  onNavigateToChat,
   onNavigateToServices,
 }) => {
   const {
     activeSystem,
     togglePump: globalTogglePump,
-    toggleGeneralValve: globalToggleValve,
     addToast,
   } = useAuth();
 
@@ -37,7 +32,6 @@ export const PanelInicio = ({
   const [cisternCapacity] = useState(activeSystem?.capacity ?? 10000);
   const [pumpActive, setPumpActive] = useState(activeSystem?.pumpActive ?? true);
   const [pressure, setPressure] = useState(activeSystem?.pressure ?? 3.6);
-  const [valveOpen, setValveOpen] = useState(activeSystem?.valveOpen ?? true);
   const [flowRate, setFlowRate] = useState(activeSystem?.flowRate ?? 14.5);
   const [isSimulatingLeak, setIsSimulatingLeak] = useState(false);
 
@@ -47,7 +41,6 @@ export const PanelInicio = ({
       setCisternLevel(activeSystem.level ?? 0.82);
       setPumpActive(activeSystem.pumpActive ?? true);
       setPressure(activeSystem.pressure ?? 3.6);
-      setValveOpen(activeSystem.valveOpen ?? true);
       setFlowRate(activeSystem.flowRate ?? 14.5);
     }
   }, [activeSystem]);
@@ -68,25 +61,6 @@ export const PanelInicio = ({
         ? 'Presión en línea estabilizada a 3.6 bar.'
         : 'Bomba en modo de reposo (0.0 bar).',
       variant: nextState ? 'info' : 'warning',
-      duration: 3500,
-    });
-  };
-
-  // Manejador: Abrir o Cerrar la Válvula General de Paso
-  const handleToggleValve = () => {
-    const nextState = !valveOpen;
-    setValveOpen(nextState);
-
-    if (globalToggleValve && activeSystem?.id) {
-      globalToggleValve(activeSystem.id);
-    }
-
-    addToast?.({
-      title: nextState ? 'Válvula General Abierta' : 'Válvula General Cerrada',
-      message: nextState
-        ? 'Suministro de agua restaurado a la instalación.'
-        : 'Cierre preventivo de paso de agua completado.',
-      variant: nextState ? 'success' : 'danger',
       duration: 3500,
     });
   };
@@ -127,9 +101,9 @@ export const PanelInicio = ({
       </div>
 
       {/* ============================================================== */}
-      {/* 2. FILA DE CONTROLES SUPERIORES (3 TARJETAS CON PADDING AMPLIO)*/}
+      {/* 2. FILA DE CONTROLES SUPERIORES (2 TARJETAS SIMÉTRICAS)        */}
       {/* ============================================================== */}
-      <div className="grid grid-cols-3 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 gap-4">
         {/* Botón 1: Cambiar Sistema */}
         <motion.button
           whileTap={{ scale: 0.96 }}
@@ -187,56 +161,17 @@ export const PanelInicio = ({
             </p>
           </div>
         </motion.button>
-
-        {/* Botón 3: Cerrar / Abrir Válvula */}
-        <motion.button
-          whileTap={{ scale: 0.96 }}
-          type="button"
-          onClick={handleToggleValve}
-          className={`p-4 rounded-2xl border flex flex-col items-center justify-center text-center gap-2.5 hover:shadow-md cursor-pointer transition min-w-0 ${
-            valveOpen
-              ? 'bg-[#E6F7FF] dark:bg-[#00C2FF]/10 border-transparent dark:border-[#00C2FF]/20'
-              : 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-900/40'
-          }`}
-          title="Toca para alternar la válvula de paso general"
-        >
-          <div
-            className={`w-11 h-11 rounded-full flex items-center justify-center shadow-xs shrink-0 ${
-              valveOpen
-                ? 'bg-white dark:bg-[#00C2FF]/20 text-[#00C2FF]'
-                : 'bg-white dark:bg-rose-900/50 text-rose-500'
-            }`}
-          >
-            {valveOpen ? (
-              <Unlock className="w-5 h-5" />
-            ) : (
-              <Lock className="w-5 h-5" />
-            )}
-          </div>
-          <div className="w-full min-w-0 space-y-1">
-            <h4 className="font-extrabold text-xs sm:text-sm text-slate-900 dark:text-slate-100 leading-snug break-words whitespace-normal">
-              {valveOpen ? 'Cerrar Válvula' : 'Abrir Válvula'}
-            </h4>
-            <p
-              className={`text-xs font-bold leading-snug break-words whitespace-normal ${
-                valveOpen ? 'text-[#00C2FF]' : 'text-rose-500'
-              }`}
-            >
-              {valveOpen ? 'Válvula Abierta' : 'Válvula Cerrada'}
-            </p>
-          </div>
-        </motion.button>
       </div>
 
       {/* ============================================================== */}
-      {/* 3. MÓDULOS DE GESTIÓN (DEBAJO DE BOTONES SUPERIORES)           */}
+      {/* 3. MÓDULOS DE GESTIÓN (3 MÓDULOS DISTRIBUIDOS UNIFORMEMENTE)   */}
       {/* ============================================================== */}
       <div className="pt-2">
         <h3 className="font-black text-base sm:text-lg text-slate-900 dark:text-white mb-4">
           Módulos de Gestión
         </h3>
 
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           {/* Módulo 1: Limpieza */}
           <div
             onClick={onNavigateToReports}
@@ -275,19 +210,6 @@ export const PanelInicio = ({
               Pipa
             </span>
           </div>
-
-          {/* Módulo 4: Soporte IA */}
-          <div
-            onClick={onNavigateToChat}
-            className="flex flex-col items-center text-center gap-2 cursor-pointer group"
-          >
-            <div className="w-14 h-14 rounded-full bg-[#00C2FF]/10 dark:bg-[#00C2FF]/20 text-[#00C2FF] flex items-center justify-center group-hover:scale-105 transition-transform shadow-xs">
-              <Bot className="w-6 h-6" />
-            </div>
-            <span className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 leading-snug break-words whitespace-normal">
-              Soporte IA
-            </span>
-          </div>
         </div>
       </div>
 
@@ -301,7 +223,7 @@ export const PanelInicio = ({
           title={`Cisterna · ${activeSystem?.name || 'Residencia Central Admin'}`}
         />
 
-        <AnimacionFlujoAgua initialFlowing={pumpActive && valveOpen} />
+        <AnimacionFlujoAgua initialFlowing={pumpActive} />
       </div>
 
       {/* ============================================================== */}

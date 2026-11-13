@@ -13,6 +13,7 @@
     "@formkit/auto-animate": "^0.10.2",
     "@gsap/react": "^2.1.2",
     "@react-spring/web": "^10.1.2",
+    "@rive-app/react-canvas": "^4.39.0",
     "@tailwindcss/vite": "^4.3.5",
     "@tsparticles/react": "^4.5.4",
     "@tsparticles/slim": "^4.5.4",

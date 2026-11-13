@@ -20,6 +20,7 @@ import { ModalSelectorAvatar } from './components/modals/ModalSelectorAvatar';
 import { DialogoCerrarSesion } from './components/modals/DialogoCerrarSesion';
 import { NordToastGroup } from './components/nord/NordToastGroup';
 import { Monitor } from 'lucide-react';
+import { BotonFlotanteSoporteIA } from './components/common/BotonFlotanteSoporteIA';
 
 const AppContent = () => {
   const { user, logout, viewMode, toggleViewMode } = useAuth();
@@ -249,7 +250,7 @@ const AppContent = () => {
   const isSubViewActive = subView !== null;
 
   return (
-    <div className="min-h-dvh flex flex-col font-sans bg-[#141618] text-slate-800 dark:text-slate-100 relative selection:bg-[#FF5B22] selection:text-white">
+    <div className="h-dvh w-full overflow-hidden flex flex-col font-sans bg-[#141618] text-slate-800 dark:text-slate-100 relative selection:bg-[#FF5B22] selection:text-white">
       {/* Sistema de Toasts */}
       <NordToastGroup position="top-right" />
 
@@ -273,9 +274,9 @@ const AppContent = () => {
       {/* ============================================================== */}
       {/* 📱 CONTENEDOR TIPO APLICACIÓN MÓVIL CENTRADO (Móvil / Web)      */}
       {/* ============================================================== */}
-      <div className="min-h-dvh w-full flex flex-col items-center justify-center sm:py-6 px-0 sm:px-4">
+      <div className="flex-1 min-h-0 w-full flex flex-col items-center justify-center sm:py-6 px-0 sm:px-4 overflow-hidden">
         {/* Barra superior de herramientas en desktop */}
-        <div className="w-full max-w-[440px] hidden sm:flex items-center justify-between mb-3 px-4 py-2 rounded-2xl bg-[#1E2022] border border-slate-800 text-xs shadow-md shrink-0">
+        <div className="w-full max-w-[480px] hidden sm:flex items-center justify-between mb-3 px-4 py-2 rounded-2xl bg-[#1E2022] border border-slate-800 text-xs shadow-md shrink-0">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#FF5B22] animate-pulse" />
             <span className="font-extrabold text-white">
@@ -292,9 +293,9 @@ const AppContent = () => {
           </button>
         </div>
 
-        {/* Marco Principal del Dispositivo */}
-        <div className="w-full max-w-[440px] h-dvh sm:h-[min(880px,92dvh)] bg-[radial-gradient(circle,#000000_0%,#505DD0_100%)] sm:rounded-[44px] sm:border-[8px] sm:border-[#2A2E33] shadow-[0_25px_70px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden relative">
-          {/* Cabecera Estilizada Directa (Sin Barra de Estado ni Isla Dinámica) */}
+        {/* Marco Principal del Dispositivo (App Shell h-dvh con scroll exclusivo en <main>) */}
+        <div className="w-full sm:max-w-[480px] mx-auto relative flex-1 min-h-0 sm:flex-none sm:h-[min(880px,92dvh)] overflow-hidden flex flex-col bg-white dark:bg-[#0B1726] sm:rounded-[44px] sm:border-[8px] sm:border-[#2A2E33] shadow-[0_25px_70px_rgba(0,0,0,0.85)]">
+          {/* Cabecera Estilizada Fija en la Cima */}
           <Encabezado
             title={getHeaderTitle()}
             showBack={isSubViewActive}
@@ -306,8 +307,12 @@ const AppContent = () => {
             }}
           />
 
-          {/* Área Principal con Scroll Vertical sin barra visible y fondo transparente sobre el degradado azul */}
-          <main className="flex-1 w-full overflow-y-auto bg-transparent no-scrollbar">
+          {/* Único Contenedor con Scroll Vertical (o contenedor fijo para Chat) */}
+          <main
+            className={`flex-1 min-h-0 w-full overflow-x-hidden bg-white dark:bg-[#0B1726] rounded-t-[28px] -mt-6 relative z-20 no-scrollbar ${
+              subView === 'chat' ? 'overflow-hidden flex flex-col pb-0' : 'overflow-y-auto pb-24'
+            }`}
+          >
             <AnimatePresence mode="wait">
               <motion.div
                 key={subView || activeTab}
@@ -315,12 +320,21 @@ const AppContent = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.22, ease: 'easeOut' }}
-                className="min-h-full flex flex-col"
+                className={
+                  subView === 'chat'
+                    ? 'flex-1 min-h-0 h-full w-full min-w-0 flex flex-col'
+                    : 'min-h-full w-full min-w-0 flex flex-col'
+                }
               >
                 {renderCurrentContent()}
               </motion.div>
             </AnimatePresence>
           </main>
+
+          {/* Botón Flotante (FAB) Rive de Soporte IA en Inicio */}
+          {activeTab === 0 && !isSubViewActive && (
+            <BotonFlotanteSoporteIA onClick={() => setSubView('chat')} />
+          )}
 
           {/* Barra de Navegación con Notch Elevado */}
           <BarraNavegacion

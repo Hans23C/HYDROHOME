@@ -1,28 +1,52 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Send, Smile, ChevronLeft, Droplets, ShieldCheck, Activity, Wifi } from 'lucide-react';
+import { motion } from 'motion/react';
+import { Send, Smile, ChevronLeft } from 'lucide-react';
+import { useRive, Layout, Fit, Alignment } from '@rive-app/react-canvas';
 import { useAuth } from '../context/AuthContext';
 
-// 1. Componente: Tarjeta de Estado del Agente / Técnico
-export const TarjetaEncabezadoAgente = ({ agentName = 'Kane Reene', status = 'Active 1m ago' }) => {
+// 1. Componente: Tarjeta de Estado del Asistente con Animación Rive
+export const TarjetaEncabezadoAgente = ({
+  agentName = 'HydroBot IA',
+  status = 'En línea',
+}) => {
+  const { rive, RiveComponent } = useRive({
+    src: '/assets/Animaciones/Bot.riv',
+    autoplay: true,
+    layout: new Layout({
+      fit: Fit.Cover,
+      alignment: Alignment.Center,
+    }),
+  });
+
+  useEffect(() => {
+    if (!rive) return;
+    if (rive.stateMachineNames?.length) {
+      rive.play(rive.stateMachineNames[0]);
+    } else if (rive.animationNames?.length) {
+      rive.play(rive.animationNames);
+    }
+  }, [rive]);
+
   return (
-    <div className="flex items-center gap-3.5 p-3 sm:p-3.5 rounded-2xl bg-slate-50 dark:bg-[#07131F]/70 border border-slate-100 dark:border-slate-800/80 mb-4 shadow-xs">
-      <div className="relative">
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#00C2FF] to-[#0284C7] text-white flex items-center justify-center font-black text-sm tracking-wider shadow-md shadow-[#00C2FF]/20">
-          KR
+    <div className="flex items-center gap-3.5 p-3 sm:p-3.5 rounded-2xl bg-slate-50 dark:bg-[#07131F]/70 border border-slate-100 dark:border-slate-800/80 mb-2 shadow-xs">
+      <div className="relative shrink-0">
+        <div className="relative w-20 h-20 rounded-full overflow-hidden shrink-0 bg-slate-900 flex items-center justify-center shadow-md shadow-[#00C2FF]/25 border border-cyan-400/30">
+          <div className="w-full h-full flex items-center justify-center scale-[3.8] transform-gpu pointer-events-none">
+            <RiveComponent className="w-full h-full block pointer-events-none" />
+          </div>
         </div>
-        <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white dark:border-[#07131F]" />
+        <span className="absolute bottom-1 right-1 z-20 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white dark:border-[#07131F]" />
       </div>
-      <div className="flex-1">
+      <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">
+          <h3 className="font-extrabold text-sm text-slate-900 dark:text-white truncate">
             {agentName}
           </h3>
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#00C2FF]/10 text-[#00C2FF] border border-[#00C2FF]/20">
-            Hydro AI
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#00C2FF]/10 text-[#0284C7] dark:text-[#00C2FF] border border-[#00C2FF]/20 shrink-0">
+            IA Hídrica
           </span>
         </div>
-        <p className="text-xs text-slate-400 dark:text-slate-400 font-medium mt-0.5 flex items-center gap-1.5">
+        <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
           {status}
         </p>
@@ -117,7 +141,7 @@ export const ChatAyudaInteligente = ({ onBack, onNavigateHome }) => {
     {
       id: 2,
       sender: 'agent',
-      text: '¡Buenos días! Soy Kane Reene, especialista de soporte técnico de Hydro Home. Estoy revisando la telemetría en tiempo real de tu vivienda.',
+      text: '¡Buenos días! Soy HydroBot IA, tu asistente inteligente de Hydro Home. Estoy analizando la telemetría en tiempo real de tu vivienda.',
       time: '08:16 AM',
     },
     {
@@ -214,36 +238,36 @@ export const ChatAyudaInteligente = ({ onBack, onNavigateHome }) => {
   };
 
   return (
-    <div className="flex-1 flex flex-col justify-between bg-white dark:bg-[#0B1726] rounded-t-[36px] min-h-[calc(100dvh-120px)] shadow-xl overflow-hidden transition-colors">
-      {/* 1. Encabezado de la Pantalla */}
-      <div className="p-6 sm:p-8 pb-3">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-            Support Chat
+    <div className="h-full min-h-0 flex-1 flex flex-col justify-between bg-white dark:bg-[#0B1726] overflow-hidden transition-colors">
+      {/* 1. Cabecera Fija del Chat */}
+      <div className="shrink-0 px-5 sm:px-6 pt-5 pb-2 bg-white dark:bg-[#0B1726] border-b border-slate-100/80 dark:border-slate-800/60">
+        <div className="flex items-center justify-between mb-1">
+          <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+            Asistente Hídrico
           </h2>
           {onBack && (
             <button
               onClick={onBack}
-              className="text-xs font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer flex items-center gap-1"
+              className="text-xs font-bold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 cursor-pointer flex items-center gap-1"
             >
               <ChevronLeft className="w-4 h-4" />
               <span>Volver</span>
             </button>
           )}
         </div>
-        <p className="text-xs sm:text-sm text-slate-400 dark:text-slate-400 leading-relaxed max-w-sm mb-4">
-          Please wait our support team will reply you as soon as possible.
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-snug mb-3">
+          Consulta telemetría, presión y niveles en tiempo real.
         </p>
 
-        {/* Tarjeta de Presencia del Agente Especialista */}
-        <TarjetaEncabezadoAgente agentName="Kane Reene" status="Active 1m ago" />
+        {/* Tarjeta de Presencia del Bot con Animación Rive */}
+        <TarjetaEncabezadoAgente agentName="HydroBot IA" status="En línea" />
 
         {/* Chips de Consultas Rápidas de Telemetría Hídrica */}
         <SugerenciasRapidas onSelectPrompt={(q) => handleSendMessage(q)} />
       </div>
 
-      {/* 2. Área Central de Conversación */}
-      <div className="flex-1 overflow-y-auto px-6 sm:px-8 py-3 space-y-4 max-h-[460px] min-h-[280px]">
+      {/* 2. Área Central de Conversación (Único Scroll Interno) */}
+      <div className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 py-3 space-y-3 no-scrollbar">
         {messages.map((msg) => (
           <BurbujaMensaje key={msg.id} message={msg} />
         ))}
@@ -252,8 +276,8 @@ export const ChatAyudaInteligente = ({ onBack, onNavigateHome }) => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* 3. Barra Inferior de Entrada de Mensaje (Pill Input con Cyan Corporativo) */}
-      <div className="p-4 sm:p-6 bg-white dark:bg-[#0B1726] border-t border-slate-100 dark:border-slate-800/80">
+      {/* 3. Barra Inferior Fija de Entrada de Mensaje (Despejada encima de la Navbar) */}
+      <div className="shrink-0 w-full z-20 px-4 sm:px-6 pt-3 pb-10 bg-white dark:bg-[#0B1726] border-t border-slate-100 dark:border-slate-800/80">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -266,7 +290,7 @@ export const ChatAyudaInteligente = ({ onBack, onNavigateHome }) => {
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Aa"
+            placeholder="Escribe tu consulta..."
             className="flex-1 bg-transparent text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none"
           />
 
@@ -274,12 +298,12 @@ export const ChatAyudaInteligente = ({ onBack, onNavigateHome }) => {
             type="button"
             onClick={() => handleSendMessage('¿Cómo está el nivel de mi cisterna hoy?')}
             className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 active:scale-95 transition cursor-pointer"
-            title="Emoji / Atajo"
+            title="Consulta rápida"
           >
             <Smile className="w-5 h-5" />
           </button>
 
-          {/* Botón de Envío: Cyan Eléctrico Corporativo (sustituyendo el naranja de la referencia) */}
+          {/* Botón de Envío */}
           <button
             type="submit"
             disabled={!inputText.trim() && !isTyping}
