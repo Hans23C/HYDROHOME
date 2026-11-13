@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Droplet, ArrowUp, ArrowDown, RotateCcw } from 'lucide-react';
 
-export const CisternLevelAnimation = ({ initialLevel = 0.68, capacity = 5000, title = 'Cisterna Principal' }) => {
+export const AnimacionNivelCisterna = ({ initialLevel = 0.68, capacity = 5000, title = 'Cisterna Principal' }) => {
   const [level, setLevel] = useState(initialLevel);
   const [isFilling, setIsFilling] = useState(false);
 

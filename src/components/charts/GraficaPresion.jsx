@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export const PressureChart = () => {
+export const GraficaPresion = () => {
   const [selectedPeriod, setSelectedPeriod] = useState(0); // 0: Turno actual, 1: Últimas 24h
   const [hoveredBar, setHoveredBar] = useState(null);
 

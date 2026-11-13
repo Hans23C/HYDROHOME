@@ -1,297 +1,336 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { SplashScreen } from './views/SplashScreen';
-import { LoginScreen } from './views/LoginScreen';
-import { HomeDashboard } from './views/HomeDashboard';
-import { MySystemsScreen } from './views/MySystemsScreen';
-import { ReportsScreen } from './views/ReportsScreen';
-import { ConsumptionChart } from './components/charts/ConsumptionChart';
-import { Header } from './components/layout/Header';
-import { NavigationBar } from './components/layout/NavigationBar';
-import { GuiaRapidaDialogo } from './components/modals/GuiaRapidaDialogo';
-import { NotificationsSheet } from './components/modals/NotificationsSheet';
-import { LogoutDialog } from './components/modals/LogoutDialog';
-import { AvatarSelectorModal } from './components/modals/AvatarSelectorModal';
-import { NordDrawer } from './components/nord/NordDrawer';
+import { PantallaCarga } from './views/PantallaCarga';
+import { PantallaIniciarSesion } from './views/PantallaIniciarSesion';
+import { PanelInicio } from './views/PanelInicio';
+import { PantallaConsumo } from './views/PantallaConsumo';
+import { PantallaMisSistemas } from './views/PantallaMisSistemas';
+import { PantallaReportes } from './views/PantallaReportes';
+import { PantallaPerfil } from './views/PantallaPerfil';
+import { ChatAyudaInteligente } from './views/ChatAyudaInteligente';
+import { PantallaContactarServicios } from './views/PantallaContactarServicios';
+import { PantallaEditarAvatar } from './views/PantallaEditarAvatar';
+import { PantallaAgregarSistemaOContrasena } from './views/PantallaAgregarSistemaOContrasena';
+import { PantallaNotificaciones } from './views/PantallaNotificaciones';
+import { Encabezado } from './components/layout/Encabezado';
+import { BarraNavegacion } from './components/layout/BarraNavegacion';
+import { ModalSelectorAvatar } from './components/modals/ModalSelectorAvatar';
+import { DialogoCerrarSesion } from './components/modals/DialogoCerrarSesion';
 import { NordToastGroup } from './components/nord/NordToastGroup';
-import { FloatingAlertBanner } from './components/notifications/FloatingAlertBanner';
-import { Monitor, Signal, Wifi, BarChart3, DollarSign } from 'lucide-react';
-
-const TAB_INDEX_TO_ID = {
-  0: 'home',
-  1: 'consumption',
-  2: 'systems',
-  3: 'reports',
-};
-
-const TAB_ID_TO_INDEX = {
-  home: 0,
-  consumption: 1,
-  systems: 2,
-  reports: 3,
-};
-
-// Apartado exclusivo de Consumo: recuadro superior despegado de la barra y gráfica siempre centrada adaptable a cualquier pantalla
-const ConsumptionView = () => {
-  const { activeSystem } = useAuth();
-  const sys = activeSystem || { name: 'Casa Principal', dailyConsumption: 248, capacity: 5000 };
-  const estimatedCost = ((sys.dailyConsumption * 30) / 1000 * 18.5).toFixed(2);
-
-  return (
-    <div className="flex-1 flex flex-col justify-center gap-6 sm:gap-7 pb-20 w-full min-h-[calc(100dvh-170px)]">
-      {/* Resumen Superior despegado con holgura de la barra superior */}
-      <div className="mt-6 sm:mt-8 liquid-glass p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0 max-w-3xl w-full mx-auto shadow-sm">
-        <div className="flex items-center gap-3.5 min-w-0">
-          <div className="w-12 h-12 rounded-2xl bg-sky-500/15 border border-sky-400/30 text-sky-500 flex items-center justify-center shrink-0">
-            <BarChart3 className="w-6 h-6" />
-          </div>
-          <div className="min-w-0">
-            <h2 className="text-base sm:text-xl font-extrabold text-slate-900 dark:text-white truncate">
-              Consumo · {sys.name}
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate mt-0.5">
-              Historial diario en litros
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-xs sm:text-sm font-bold text-emerald-600 dark:text-emerald-400 shrink-0">
-          <DollarSign className="w-4 h-4" />
-          <span>Est. Mensual: ${estimatedCost} MXN</span>
-        </div>
-      </div>
-
-      {/* Gráfica Oficial de Consumo siempre centrada */}
-      <div className="flex-1 flex flex-col items-center justify-center w-full max-w-3xl mx-auto my-auto">
-        <ConsumptionChart />
-      </div>
-    </div>
-  );
-};
+import { Monitor } from 'lucide-react';
 
 const AppContent = () => {
-  const { user, logout, viewMode, toggleViewMode, isDark } = useAuth();
-  const [currentView, setCurrentView] = useState('splash');
-  const [isGuideOpen, setIsGuideOpen] = useState(false);
-  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const [isLogoutOpen, setIsLogoutOpen] = useState(false);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const { user, logout, viewMode, toggleViewMode } = useAuth();
+
+  // Persistencia de etapa de la app: si existe sesión en localStorage, entra directo a 'tabs'
+  const [appStage, setAppStage] = useState(() => {
+    try {
+      const hasToken = Boolean(localStorage.getItem('session_token'));
+      const hasUser = Boolean(
+        localStorage.getItem('user_email') || localStorage.getItem('hydro_session_user')
+      );
+      if (hasToken && hasUser) {
+        return 'tabs';
+      }
+    } catch (_) {}
+    return 'splash';
+  });
+
+  // Pestaña activa principal persistente (0: Inicio, 1: Consumo, 2: Sistemas, 3: Perfil)
+  const [activeTab, setActiveTab] = useState(() => {
+    try {
+      const savedTab = localStorage.getItem('hydro_active_tab');
+      return savedTab !== null ? Number(savedTab) : 0;
+    } catch (_) {
+      return 0;
+    }
+  });
+
+  // Sub-vista activa: null | 'notifications' | 'chat' | 'contact' | 'edit-avatar' | 'add-system' | 'change-password' | 'faq'
+  const [subView, setSubView] = useState(null);
+
+  // Modales globales
   const [isAvatarSelectorOpen, setIsAvatarSelectorOpen] = useState(false);
+  const [isLogoutOpen, setIsLogoutOpen] = useState(false);
+
+  // Mantener sincronizado el estado de navegación y sesión con localStorage
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('hydro_app_stage', 'tabs');
+      localStorage.setItem('hydro_active_tab', String(activeTab));
+      if (appStage === 'login') {
+        setAppStage('tabs');
+      }
+    }
+  }, [user, activeTab, appStage]);
 
   const handleSplashFinish = useCallback((target) => {
-    if (target === 'login') {
-      setCurrentView('login');
+    if (target === 'login' && !localStorage.getItem('session_token')) {
+      setAppStage('login');
     } else {
-      setCurrentView(0);
+      setAppStage('tabs');
     }
   }, []);
 
-  if (currentView === 'splash') {
+  if (appStage === 'splash') {
     return (
       <AnimatePresence mode="wait">
-        <SplashScreen key="splash" onFinish={handleSplashFinish} />
+        <PantallaCarga key="splash" onFinish={handleSplashFinish} />
       </AnimatePresence>
     );
   }
 
-  if (currentView === 'login' || !user) {
+  if (appStage === 'login' || !user) {
     return (
       <AnimatePresence mode="wait">
-        <LoginScreen
+        <PantallaIniciarSesion
           key="login"
-          onLoginSuccess={(initialTab) => {
-            setCurrentView(initialTab || 0);
+          onLoginSuccess={() => {
+            setAppStage('tabs');
+            setActiveTab(0);
+            setSubView(null);
           }}
         />
       </AnimatePresence>
     );
   }
 
-  const numericTab = typeof currentView === 'number' ? currentView : (TAB_ID_TO_INDEX[currentView] ?? 0);
-  const stringTabId = TAB_INDEX_TO_ID[numericTab] || 'home';
+  // Navegación de pestañas
+  const handleSelectTab = (tabIndex) => {
+    setActiveTab(tabIndex);
+    setSubView(null);
+  };
 
-  const handleSelectTab = (tab) => {
-    if (typeof tab === 'number') {
-      setCurrentView(tab);
-    } else if (typeof tab === 'string' && TAB_ID_TO_INDEX[tab] !== undefined) {
-      setCurrentView(TAB_ID_TO_INDEX[tab]);
+  // Volver atrás desde una sub-vista
+  const handleBack = () => {
+    setSubView(null);
+  };
+
+  // Títulos dinámicos de cabecera 100% en español
+  const getHeaderTitle = () => {
+    if (subView === 'notifications') return 'Notificaciones';
+    if (subView === 'chat') return 'Soporte Inteligente';
+    if (subView === 'contact') return 'Servicios de Agua Potable';
+    if (subView === 'edit-avatar') return 'Editar Perfil';
+    if (subView === 'change-password') return 'Cambiar Contraseña';
+    if (subView === 'add-system') return 'Enlazar Sistema';
+    if (subView === 'faq') return 'Preguntas Frecuentes';
+
+    switch (activeTab) {
+      case 0:
+        return null; // Muestra el logo de Hydro Home
+      case 1:
+        return 'Historial de Consumo';
+      case 2:
+        return 'Mis Sistemas';
+      case 3:
+        return 'Mi Perfil';
+      default:
+        return null;
     }
   };
 
-  const renderActiveView = () => {
-    switch (numericTab) {
+  const renderCurrentContent = () => {
+    // Si hay una sub-vista activa, se renderiza con prioridad
+    if (subView) {
+      switch (subView) {
+        case 'notifications':
+          return (
+            <PantallaNotificaciones
+              onBack={handleBack}
+              onNavigateToChat={() => setSubView('chat')}
+            />
+          );
+        case 'chat':
+          return (
+            <ChatAyudaInteligente
+              onBack={handleBack}
+              onNavigateHome={() => {
+                setSubView(null);
+                setActiveTab(0);
+              }}
+            />
+          );
+        case 'contact':
+          return (
+            <PantallaContactarServicios
+              onNavigateToChat={() => setSubView('chat')}
+              onNavigateToFaq={() => setSubView('faq')}
+              onNavigateHome={() => {
+                setSubView(null);
+                setActiveTab(0);
+              }}
+            />
+          );
+        case 'edit-avatar':
+          return (
+            <PantallaEditarAvatar
+              onBack={handleBack}
+              onChangePassword={() => setSubView('change-password')}
+              onOpenAvatarSelector={() => setIsAvatarSelectorOpen(true)}
+            />
+          );
+        case 'change-password':
+          return (
+            <PantallaAgregarSistemaOContrasena
+              initialMode="password"
+              onBack={handleBack}
+              onFinish={handleBack}
+            />
+          );
+        case 'add-system':
+          return (
+            <PantallaAgregarSistemaOContrasena
+              initialMode="system"
+              onBack={handleBack}
+              onFinish={() => {
+                setSubView(null);
+                setActiveTab(2);
+              }}
+            />
+          );
+        case 'faq':
+          return (
+            <PantallaReportes
+              onNavigateHome={() => {
+                setSubView(null);
+                setActiveTab(0);
+              }}
+            />
+          );
+        default:
+          break;
+      }
+    }
+
+    // Si no hay sub-vista, se renderiza la pestaña principal
+    switch (activeTab) {
       case 0:
         return (
-          <HomeDashboard
-            onNavigateToSystems={() => handleSelectTab(2)}
-            onNavigateToReports={() => handleSelectTab(3)}
+          <PanelInicio
+            onNavigateToSystems={() => setActiveTab(2)}
+            onNavigateToReports={() => setSubView('faq')}
+            onNavigateToChat={() => setSubView('chat')}
+            onNavigateToServices={() => setSubView('contact')}
           />
         );
       case 1:
-        return <ConsumptionView />;
+        return <PantallaConsumo />;
       case 2:
-        return <MySystemsScreen onSelectSystemAndGoHome={() => handleSelectTab(0)} />;
+        return (
+          <PantallaMisSistemas
+            onSelectSystemAndGoHome={() => setActiveTab(0)}
+            onNavigateToAddSystem={() => setSubView('add-system')}
+            onNavigateToServices={() => setSubView('contact')}
+          />
+        );
       case 3:
-        return <ReportsScreen />;
+        return (
+          <PantallaPerfil
+            onNavigateToEditAvatar={() => setSubView('edit-avatar')}
+            onNavigateToSystems={() => setActiveTab(2)}
+            onNavigateToContactUs={() => setSubView('contact')}
+            onOpenAvatarSelector={() => setIsAvatarSelectorOpen(true)}
+            onOpenLogout={() => setIsLogoutOpen(true)}
+          />
+        );
       default:
         return (
-          <HomeDashboard
-            onNavigateToSystems={() => handleSelectTab(2)}
-            onNavigateToReports={() => handleSelectTab(3)}
+          <PanelInicio
+            onNavigateToSystems={() => setActiveTab(2)}
+            onNavigateToReports={() => setSubView('faq')}
+            onNavigateToChat={() => setSubView('chat')}
+            onNavigateToServices={() => setSubView('contact')}
           />
         );
     }
   };
 
+  const isSubViewActive = subView !== null;
+
   return (
-    <div
-      className={`min-h-dvh flex flex-col font-sans transition-colors duration-300 selection:bg-cyan-500 selection:text-white relative ${
-        isDark ? 'bg-[#07131F] text-slate-100' : 'bg-slate-100 text-slate-800'
-      }`}
-    >
-      {/* Toasts automáticos de 5 segundos */}
+    <div className="min-h-dvh flex flex-col font-sans bg-[#141618] text-slate-800 dark:text-slate-100 relative selection:bg-[#FF5B22] selection:text-white">
+      {/* Sistema de Toasts */}
       <NordToastGroup position="top-right" />
 
-      {/* Selector de Avatar */}
-      <AvatarSelectorModal
+      {/* Selector de Avatar DiceBear */}
+      <ModalSelectorAvatar
         isOpen={isAvatarSelectorOpen}
         onClose={() => setIsAvatarSelectorOpen(false)}
       />
 
-      {/* Drawer Lateral del Avatar */}
-      <NordDrawer
-        isOpen={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
-        onOpenLogout={() => {
-          setIsDrawerOpen(false);
-          setIsLogoutOpen(true);
-        }}
-        onOpenAvatarSelector={() => {
-          setIsDrawerOpen(false);
-          setIsAvatarSelectorOpen(true);
-        }}
-      />
-
-      {/* Diálogos Globales */}
-      <GuiaRapidaDialogo isOpen={isGuideOpen} onClose={() => setIsGuideOpen(false)} />
-      <NotificationsSheet isOpen={isNotificationsOpen} onClose={() => setIsNotificationsOpen(false)} />
-      <LogoutDialog
+      {/* Diálogo de Confirmación de Cierre de Sesión */}
+      <DialogoCerrarSesion
         isOpen={isLogoutOpen}
         onClose={() => setIsLogoutOpen(false)}
         onConfirm={() => {
           setIsLogoutOpen(false);
           logout();
-          setCurrentView('login');
+          setAppStage('login');
         }}
       />
 
       {/* ============================================================== */}
-      {/* 📱 MODO SIMULADOR MÓVIL (Adaptado a lo largo de cada pantalla)  */}
+      {/* 📱 CONTENEDOR TIPO APLICACIÓN MÓVIL CENTRADO (Móvil / Web)      */}
       {/* ============================================================== */}
-      {viewMode === 'mobile-frame' ? (
-        <div className="min-h-dvh w-full bg-slate-200 dark:bg-slate-950 flex flex-col items-center justify-center sm:py-4 px-0 sm:px-4 transition-colors">
-          <div className="w-full max-w-[440px] hidden sm:flex items-center justify-between mb-2.5 px-4 py-2 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 text-xs shadow-sm shrink-0">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="font-bold text-slate-800 dark:text-slate-200">
-                Hydro Home Móvil
-              </span>
-            </div>
-            <button
-              onClick={toggleViewMode}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-50 dark:bg-cyan-500/15 hover:bg-cyan-100 dark:hover:bg-cyan-500/25 text-cyan-700 dark:text-cyan-300 font-bold border border-cyan-300 dark:border-cyan-500/30 transition-colors cursor-pointer"
-            >
-              <Monitor className="w-3.5 h-3.5" />
-              <span>Modo Escritorio</span>
-            </button>
+      <div className="min-h-dvh w-full flex flex-col items-center justify-center sm:py-6 px-0 sm:px-4">
+        {/* Barra superior de herramientas en desktop */}
+        <div className="w-full max-w-[440px] hidden sm:flex items-center justify-between mb-3 px-4 py-2 rounded-2xl bg-[#1E2022] border border-slate-800 text-xs shadow-md shrink-0">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#FF5B22] animate-pulse" />
+            <span className="font-extrabold text-white">
+              Shifty Hydro 2.0
+            </span>
           </div>
 
-          <div className="w-full max-w-[440px] h-dvh sm:h-[min(860px,90dvh)] bg-slate-50 dark:bg-[#07131F] sm:rounded-[44px] sm:border-[8px] sm:border-slate-300 dark:sm:border-slate-800 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.25)] dark:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.95)] flex flex-col overflow-hidden relative sm:ring-1 sm:ring-slate-400/40 dark:sm:ring-slate-700/50">
-            {/* Barra de Estado Telefónica */}
-            <div className="w-full h-9 px-6 pt-1.5 flex items-center justify-between bg-white/95 dark:bg-[#07131F]/95 text-slate-800 dark:text-slate-200 select-none z-30 shrink-0 border-b border-slate-100 dark:border-slate-800/40">
-              <span className="font-bold text-xs tracking-tight">9:41</span>
-
-              <div className="w-24 h-5 bg-black rounded-full flex items-center justify-center gap-1.5 px-2 shadow-inner">
-                <div className="w-2 h-2 rounded-full bg-slate-900 border border-slate-800" />
-                <div className="w-1.5 h-1.5 rounded-full bg-cyan-900/80" />
-              </div>
-
-              <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 text-[10px]">
-                <Signal className="w-3 h-3" />
-                <Wifi className="w-3 h-3" />
-                <div className="w-4 h-2 rounded-xs border border-current p-0.5 flex items-center">
-                  <div className="h-full w-2 bg-current rounded-xs" />
-                </div>
-              </div>
-            </div>
-
-            {/* Cabecera Minimalista (Logo, Notificaciones y Avatar) */}
-            <Header
-              activeTab={stringTabId}
-              setActiveTab={handleSelectTab}
-              onOpenNotifications={() => setIsNotificationsOpen(true)}
-              onOpenDrawer={() => setIsDrawerOpen(true)}
-            />
-
-            <main className="flex-1 w-full overflow-y-auto p-4 sm:p-5 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700">
-              <FloatingAlertBanner onOpenNotifications={() => setIsNotificationsOpen(true)} />
-
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={numericTab}
-                  initial={{ opacity: 0, y: 10, scale: 0.99 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -10, scale: 0.99 }}
-                  transition={{ duration: 0.25, ease: 'easeOut' }}
-                >
-                  {renderActiveView()}
-                </motion.div>
-              </AnimatePresence>
-            </main>
-
-            <NavigationBar
-              activeTab={numericTab}
-              onSelectTab={handleSelectTab}
-              isInsideFrame={true}
-            />
-          </div>
+          <button
+            onClick={toggleViewMode}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold transition-colors cursor-pointer"
+          >
+            <Monitor className="w-3.5 h-3.5" />
+            <span>{viewMode === 'mobile-frame' ? 'Pantalla Completa' : 'Modo Simulador'}</span>
+          </button>
         </div>
-      ) : (
-        /* ============================================================== */
-        /* 💻 MODO ESCRITORIO / WEB COMPLETO (Adaptado a lo largo dvh)     */
-        /* ============================================================== */
-        <div className="flex-1 flex flex-col min-h-dvh justify-between">
-          <Header
-            activeTab={stringTabId}
-            setActiveTab={handleSelectTab}
-            onOpenNotifications={() => setIsNotificationsOpen(true)}
-            onOpenDrawer={() => setIsDrawerOpen(true)}
+
+        {/* Marco Principal del Dispositivo */}
+        <div className="w-full max-w-[440px] h-dvh sm:h-[min(880px,92dvh)] bg-[radial-gradient(circle,#000000_0%,#505DD0_100%)] sm:rounded-[44px] sm:border-[8px] sm:border-[#2A2E33] shadow-[0_25px_70px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden relative">
+          {/* Cabecera Estilizada Directa (Sin Barra de Estado ni Isla Dinámica) */}
+          <Encabezado
+            title={getHeaderTitle()}
+            showBack={isSubViewActive}
+            onBack={handleBack}
+            onOpenNotifications={() => setSubView('notifications')}
+            onOpenProfile={() => {
+              setSubView(null);
+              setActiveTab(3);
+            }}
           />
 
-          <main className="flex-1 max-w-7xl w-full mx-auto p-5 sm:p-8 pb-28">
-            <FloatingAlertBanner onOpenNotifications={() => setIsNotificationsOpen(true)} />
-
+          {/* Área Principal con Scroll Vertical sin barra visible y fondo transparente sobre el degradado azul */}
+          <main className="flex-1 w-full overflow-y-auto bg-transparent no-scrollbar">
             <AnimatePresence mode="wait">
               <motion.div
-                key={numericTab}
-                initial={{ opacity: 0, y: 12, scale: 0.99 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -12, scale: 0.99 }}
-                transition={{ duration: 0.28, ease: 'easeOut' }}
+                key={subView || activeTab}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.22, ease: 'easeOut' }}
+                className="min-h-full flex flex-col"
               >
-                {renderActiveView()}
+                {renderCurrentContent()}
               </motion.div>
             </AnimatePresence>
           </main>
 
-          <NavigationBar
-            activeTab={numericTab}
+          {/* Barra de Navegación con Notch Elevado */}
+          <BarraNavegacion
+            activeTab={activeTab}
             onSelectTab={handleSelectTab}
-            isInsideFrame={false}
+            isInsideFrame={true}
           />
         </div>
-      )}
+      </div>
     </div>
   );
 };

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { motion } from 'motion/react';
 import { useAuth } from '../context/AuthContext';
 
-export const SplashScreen = ({ onFinish }) => {
+export const PantallaCarga = ({ onFinish }) => {
   const { user } = useAuth();
   const onFinishRef = useRef(onFinish);
   const userRef = useRef(user);
@@ -62,4 +62,4 @@ export const SplashScreen = ({ onFinish }) => {
   );
 };
 
-export default SplashScreen;
+export default PantallaCarga;

@@ -4,7 +4,7 @@ import React from 'react';
  * Componente de borde eléctrico/plasma inspirado en el trabajo de Bálint Ferenczy.
  * Envuelve cualquier elemento con un borde reactivo de corriente viva y destellos de energía.
  */
-export const ElectricBorder = ({ children, color = '#EF4444', className = '' }) => {
+export const BordeElectrico = ({ children, color = '#EF4444', className = '' }) => {
   return (
     <div className={`relative p-[1.5px] rounded-2xl overflow-hidden group ${className}`}>
       {/* Capa de corriente eléctrica en rotación continua */}

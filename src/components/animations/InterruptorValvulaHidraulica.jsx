@@ -5,7 +5,7 @@ import { Power, Check, RefreshCw } from 'lucide-react';
  * Interruptor táctil de válvula hidráulica inspirado en Jon Kantner (CSS mechanical micro-interactions).
  * Simula una perilla / palanca de válvula industrial con cambio de presión y feedback táctil.
  */
-export const HydraulicValveSwitch = ({
+export const InterruptorValvulaHidraulica = ({
   isOn = true,
   onToggle,
   label = 'Bypass Hidráulico',

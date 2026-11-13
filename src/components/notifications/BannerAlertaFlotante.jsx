@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-export const FloatingAlertBanner = ({ onOpenNotifications }) => {
+export const BannerAlertaFlotante = ({ onOpenNotifications }) => {
   const {
     notifications,
     showNotificationBanner,
@@ -250,4 +250,4 @@ export const FloatingAlertBanner = ({ onOpenNotifications }) => {
   );
 };
 
-export default FloatingAlertBanner;
+export default BannerAlertaFlotante;

@@ -2,7 +2,7 @@ import React from 'react';
 import { LogOut, ShieldAlert } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-export const LogoutDialog = ({ isOpen, onClose, onConfirm }) => {
+export const DialogoCerrarSesion = ({ isOpen, onClose, onConfirm }) => {
   const { isDark, user } = useAuth();
 
   if (!isOpen) return null;
@@ -82,4 +82,4 @@ export const LogoutDialog = ({ isOpen, onClose, onConfirm }) => {
   );
 };
 
-export default LogoutDialog;
+export default DialogoCerrarSesion;

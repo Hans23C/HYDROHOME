@@ -11,10 +11,10 @@ const transTilt = (x, y, s) =>
   `perspective(600px) rotateX(${x}deg) rotateY(${y}deg) scale(${s})`;
 
 /**
- * SpringTiltCard
+ * TarjetaInclinacion
  * Componente que aplica física de resorte 3D elástica al pasar el cursor o interactuar.
  */
-export const SpringTiltCard = ({ children, className = '', enabled = true, ...props }) => {
+export const TarjetaInclinacion = ({ children, className = '', enabled = true, ...props }) => {
   const cardRef = useRef(null);
 
   const [springProps, setSpring] = useSpring(() => ({
@@ -54,4 +54,4 @@ export const SpringTiltCard = ({ children, className = '', enabled = true, ...pr
   );
 };
 
-export default SpringTiltCard;
+export default TarjetaInclinacion;

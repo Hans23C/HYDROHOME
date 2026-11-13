@@ -3,11 +3,11 @@ import { Particles, ParticlesProvider } from '@tsparticles/react';
 import { loadSlim } from '@tsparticles/slim';
 
 /**
- * WaterParticles
+ * ParticulasAgua
  * Componente de partículas acuáticas interactivo y optimizado para Hydro Home.
  * Reacciona a toques y gestos en pantalla (dispersión y generación de gotas/burbujas).
  */
-export const WaterParticles = ({ className = 'absolute inset-0 pointer-events-auto z-0' }) => {
+export const ParticulasAgua = ({ className = 'absolute inset-0 pointer-events-auto z-0' }) => {
   // Configuración de tsParticles optimizada para dispositivos móviles y temática acuática
   const options = useMemo(() => ({
     fullScreen: { enable: false },
@@ -117,4 +117,4 @@ export const WaterParticles = ({ className = 'absolute inset-0 pointer-events-au
   );
 };
 
-export default WaterParticles;
+export default ParticulasAgua;

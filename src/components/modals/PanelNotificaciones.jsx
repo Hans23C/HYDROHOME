@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-export const NotificationsSheet = ({ isOpen, onClose }) => {
+export const PanelNotificaciones = ({ isOpen, onClose }) => {
   const { notifications, removeNotification, markNotificationsAsSeen } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState('todas');
 
@@ -180,4 +180,4 @@ export const NotificationsSheet = ({ isOpen, onClose }) => {
   );
 };
 
-export default NotificationsSheet;
+export default PanelNotificaciones;

@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Waves, Pause, Play, Gauge } from 'lucide-react';
 
-export const WaterFlowAnimation = ({ initialFlowing = true }) => {
+export const AnimacionFlujoAgua = ({ initialFlowing = true }) => {
   const [isFlowing, setIsFlowing] = useState(initialFlowing);
   const canvasRef = useRef(null);
   const animFrameRef = useRef(null);

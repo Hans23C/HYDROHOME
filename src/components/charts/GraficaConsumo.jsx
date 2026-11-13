@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 
-export const ConsumptionChart = () => {
+export const GraficaConsumo = () => {
   const [rangeIndex, setRangeIndex] = useState(1); // 0: 7D, 1: 14D, 2: 21D
   const [hoveredPoint, setHoveredPoint] = useState(null);
 

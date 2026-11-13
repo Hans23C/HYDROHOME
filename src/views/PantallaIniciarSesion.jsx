@@ -6,9 +6,9 @@ import {
   EyeOff,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { WaterParticles } from '../components/common/WaterParticles';
+import { ParticulasAgua } from '../components/common/ParticulasAgua';
 
-export const LoginScreen = ({ onLoginSuccess }) => {
+export const PantallaIniciarSesion = ({ onLoginSuccess }) => {
   const { login, registerUser } = useAuth();
 
   // Estados de vista: 'welcome' | 'login' | 'register'
@@ -161,7 +161,7 @@ export const LoginScreen = ({ onLoginSuccess }) => {
       <div className="fixed -bottom-32 -right-32 w-[440px] h-[440px] rounded-full bg-sky-500/15 blur-[120px] pointer-events-none" />
 
       {/* tsParticles: fondo fijo absoluto a pantalla completa */}
-      <WaterParticles className="absolute inset-0 z-0 pointer-events-none" />
+      <ParticulasAgua className="absolute inset-0 z-0 pointer-events-none" />
 
       {/*
         Contenedor principal a altura completa de pantalla.
@@ -496,4 +496,4 @@ export const LoginScreen = ({ onLoginSuccess }) => {
   );
 };
 
-export default LoginScreen;
+export default PantallaIniciarSesion;

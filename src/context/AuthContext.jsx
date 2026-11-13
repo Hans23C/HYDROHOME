@@ -170,12 +170,23 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('hydro_registered_accounts', JSON.stringify(registeredAccounts));
   }, [registeredAccounts]);
 
-  // 2. Sesión del usuario actual
+  // 2. Sesión del usuario actual (Persistente en localStorage)
   const [user, setUser] = useState(() => {
     try {
       const storedToken = localStorage.getItem('session_token');
       const userEmail = localStorage.getItem('user_email');
-      if (!storedToken || !userEmail) return null;
+      const cachedSessionUser = localStorage.getItem('hydro_session_user');
+
+      if (!storedToken) return null;
+
+      if (cachedSessionUser) {
+        const parsed = JSON.parse(cachedSessionUser);
+        if (parsed && parsed.email) {
+          return { ...parsed, token: storedToken };
+        }
+      }
+
+      if (!userEmail) return null;
 
       const found = registeredAccounts.find(
         (a) => a.email.toLowerCase() === userEmail.toLowerCase()
@@ -421,7 +432,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('user_email', cleanEmail);
     localStorage.setItem('user_name', `${found.firstName} ${found.lastName}`.trim());
 
-    setUser({
+    const sessionUserObj = {
       token,
       id: found.id,
       name: `${found.firstName} ${found.lastName}`.trim(),
@@ -433,7 +444,11 @@ export const AuthProvider = ({ children }) => {
       avatarStyle: found.avatarStyle || 'clay',
       avatarSeed: found.avatarSeed || found.firstName,
       activeSystemId: found.activeSystemId || found.systems?.[0]?.id || 'sys-01',
-    });
+    };
+
+    localStorage.setItem('hydro_session_user', JSON.stringify(sessionUserObj));
+    localStorage.setItem('hydro_app_stage', 'tabs');
+    setUser(sessionUserObj);
 
     setUserSystems(found.systems?.length ? found.systems : INITIAL_DEMO_SYSTEMS);
     setActiveSystemId(found.activeSystemId || found.systems?.[0]?.id || 'sys-01');
@@ -452,11 +467,14 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
-  // Cerrar Sesión
+  // Cerrar Sesión (Único punto donde se limpia el almacenamiento local de sesión)
   const logout = () => {
     localStorage.removeItem('session_token');
     localStorage.removeItem('user_email');
     localStorage.removeItem('user_name');
+    localStorage.removeItem('hydro_session_user');
+    localStorage.removeItem('hydro_app_stage');
+    localStorage.removeItem('hydro_active_tab');
     setUser(null);
 
     const hasUnseen = notifications.some((n) => n.unseen);
@@ -641,6 +659,23 @@ export const AuthProvider = ({ children }) => {
     );
   };
 
+  const updateUserProfile = (profileData) => {
+    if (!user) return;
+    const updated = { ...user, ...profileData };
+    setUser(updated);
+    setRegisteredAccounts((prev) =>
+      prev.map((acc) => {
+        if (acc.email.toLowerCase() === user.email.toLowerCase()) {
+          return { ...acc, ...profileData };
+        }
+        return acc;
+      })
+    );
+    try {
+      localStorage.setItem('hydro_session_user', JSON.stringify(updated));
+    } catch (_) {}
+  };
+
   const updateSoundAlerts = (enabled) => {
     setSoundAlerts(enabled);
     localStorage.setItem('hydro_sound_alerts', enabled.toString());
@@ -685,7 +720,9 @@ export const AuthProvider = ({ children }) => {
         toasts,
         addToast,
         removeToast,
+        updateToast: addToast,
         updateAvatar,
+        updateUserProfile,
       }}
     >
       {children}

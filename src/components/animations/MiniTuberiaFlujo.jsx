@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 
-export const MiniFlowPipe = ({ color = '#10B981', isDark = true }) => {
+export const MiniTuberiaFlujo = ({ color = '#10B981', isDark = true }) => {
   const canvasRef = useRef(null);
   const phaseRef = useRef(0);
   const animFrameRef = useRef(null);

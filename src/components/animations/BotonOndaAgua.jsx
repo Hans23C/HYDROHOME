@@ -2,10 +2,10 @@ import React, { useRef } from 'react';
 import anime from 'animejs';
 
 /**
- * WaterRippleButton
+ * BotonOndaAgua
  * Botón con efecto de onda hídrica expansiva (Water Ripple) impulsada por Anime.js.
  */
-export const WaterRippleButton = ({
+export const BotonOndaAgua = ({
   children,
   onClick,
   className = '',
@@ -69,4 +69,4 @@ export const WaterRippleButton = ({
   );
 };
 
-export default WaterRippleButton;
+export default BotonOndaAgua;

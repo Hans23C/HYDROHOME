@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, Sparkles, Check, RefreshCw, Wand2 } from 'lucide-react';
 import { useAuth, DICEBEAR_COLLECTIONS, getDicebearAvatarUrl } from '../../context/AuthContext';
 
-export const AvatarSelectorModal = ({ isOpen, onClose }) => {
+export const ModalSelectorAvatar = ({ isOpen, onClose }) => {
   const { user, updateAvatar, addToast } = useAuth();
 
   const [activeTab, setActiveTab] = useState(user?.avatarStyle || 'voxel-bot');
@@ -245,4 +245,4 @@ export const AvatarSelectorModal = ({ isOpen, onClose }) => {
   );
 };
 
-export default AvatarSelectorModal;
+export default ModalSelectorAvatar;

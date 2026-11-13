@@ -1,7 +1,7 @@
 import React from 'react';
 import { Activity, ShieldCheck, Wifi } from 'lucide-react';
 
-export const CampusFooter = ({ className = '' }) => {
+export const PiePaginaCampus = ({ className = '' }) => {
   return (
     <footer className={`mt-8 pt-6 pb-4 border-t border-slate-200 dark:border-slate-800/80 ${className}`}>
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
@@ -29,4 +29,4 @@ export const CampusFooter = ({ className = '' }) => {
   );
 };
 
-export default CampusFooter;
+export default PiePaginaCampus;
