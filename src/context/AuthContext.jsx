@@ -500,7 +500,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const linkNewSystem = ({ name, address, capacity = 5000, deviceId }) => {
+  const linkNewSystem = ({ name, address, capacity = 5000, deviceId, silent = false }) => {
     const newSysId = `sys-${Date.now()}`;
     const newSystem = {
       id: newSysId,
@@ -531,12 +531,14 @@ export const AuthProvider = ({ children }) => {
       systemName: newSystem.name,
     });
 
-    addToast({
-      title: '¡Vivienda Enlazada con Éxito!',
-      message: `El sistema "${newSystem.name}" ya está sincronizado y activo.`,
-      variant: 'success',
-      duration: 5000,
-    });
+    if (!silent) {
+      addToast({
+        title: '¡Vivienda Enlazada con Éxito!',
+        message: `El sistema "${newSystem.name}" ya está sincronizado y activo.`,
+        variant: 'success',
+        duration: 5000,
+      });
+    }
   };
 
   const unlinkSystem = (systemId) => {

@@ -12,6 +12,7 @@ import { ChatAyudaInteligente } from './views/ChatAyudaInteligente';
 import { PantallaContactarServicios } from './views/PantallaContactarServicios';
 import { PantallaEditarAvatar } from './views/PantallaEditarAvatar';
 import { PantallaAgregarSistemaOContrasena } from './views/PantallaAgregarSistemaOContrasena';
+import { PantallaNuevoSistemaFlujo } from './views/PantallaNuevoSistemaFlujo';
 import { PantallaNotificaciones } from './views/PantallaNotificaciones';
 import { Encabezado } from './components/layout/Encabezado';
 import { BarraNavegacion } from './components/layout/BarraNavegacion';
@@ -114,7 +115,7 @@ const AppContent = () => {
     if (subView === 'contact') return 'Servicios de Agua Potable';
     if (subView === 'edit-avatar') return 'Editar Perfil';
     if (subView === 'change-password') return 'Cambiar Contraseña';
-    if (subView === 'add-system') return 'Enlazar Sistema';
+    if (subView === 'add-system') return 'Agregar Nuevo Sistema';
     if (subView === 'faq') return 'Preguntas Frecuentes';
 
     switch (activeTab) {
@@ -181,9 +182,7 @@ const AppContent = () => {
           );
         case 'add-system':
           return (
-            <PantallaAgregarSistemaOContrasena
-              initialMode="system"
-              onBack={handleBack}
+            <PantallaNuevoSistemaFlujo
               onFinish={() => {
                 setSubView(null);
                 setActiveTab(2);
