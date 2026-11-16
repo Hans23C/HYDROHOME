@@ -174,6 +174,11 @@ const AppContent = () => {
               botStage={botStage}
               setBotStage={setBotStage}
               onBack={handleBack}
+              onNavigateToHistory={() => {
+                setBotStage('home');
+                setSubView(null);
+                setActiveTab(1);
+              }}
               onNavigateHome={() => {
                 setBotStage('home');
                 setSubView(null);
