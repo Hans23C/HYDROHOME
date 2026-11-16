@@ -52,6 +52,10 @@ const AppContent = () => {
   // Sub-vista activa: null | 'notifications' | 'chat' | 'contact' | 'edit-avatar' | 'add-system' | 'change-password' | 'faq'
   const [subView, setSubView] = useState(null);
 
+  // Máquina de estados de 4 etapas para la experiencia Rive del Asistente IA:
+  // 'home' | 'intro_bot' | 'chat' | 'outro_bot'
+  const [botStage, setBotStage] = useState('home');
+
   // Modales globales
   const [isAvatarSelectorOpen, setIsAvatarSelectorOpen] = useState(false);
   const [isLogoutOpen, setIsLogoutOpen] = useState(false);
@@ -98,14 +102,34 @@ const AppContent = () => {
     );
   }
 
-  // Navegación de pestañas
+  // Abre la experiencia de 4 etapas de Soporte IA iniciando en 'intro_bot'
+  const handleOpenSupportBot = () => {
+    setBotStage('intro_bot');
+    setSubView('chat');
+  };
+
+  // Navegación de pestañas (si está dentro del chat, fuerza el paso por la despedida 'outro_bot')
   const handleSelectTab = (tabIndex) => {
+    if (subView === 'chat' && botStage === 'chat') {
+      setBotStage('outro_bot');
+      return;
+    }
     setActiveTab(tabIndex);
     setSubView(null);
+    setBotStage('home');
   };
 
   // Volver atrás desde una sub-vista
   const handleBack = () => {
+    if (subView === 'chat') {
+      if (botStage === 'chat') {
+        setBotStage('outro_bot');
+        return;
+      }
+      setBotStage('home');
+      setSubView(null);
+      return;
+    }
     setSubView(null);
   };
 
@@ -117,7 +141,7 @@ const AppContent = () => {
     if (subView === 'edit-avatar') return 'Editar Perfil';
     if (subView === 'change-password') return 'Cambiar Contraseña';
     if (subView === 'add-system') return 'Agregar Nuevo Sistema';
-    if (subView === 'faq') return 'Preguntas Frecuentes';
+    if (subView === 'faq') return 'Bitácora de Incidencias';
 
     switch (activeTab) {
       case 0:
@@ -141,14 +165,17 @@ const AppContent = () => {
           return (
             <PantallaNotificaciones
               onBack={handleBack}
-              onNavigateToChat={() => setSubView('chat')}
+              onNavigateToChat={handleOpenSupportBot}
             />
           );
         case 'chat':
           return (
             <ChatAyudaInteligente
+              botStage={botStage}
+              setBotStage={setBotStage}
               onBack={handleBack}
               onNavigateHome={() => {
+                setBotStage('home');
                 setSubView(null);
                 setActiveTab(0);
               }}
@@ -157,7 +184,7 @@ const AppContent = () => {
         case 'contact':
           return (
             <PantallaContactarServicios
-              onNavigateToChat={() => setSubView('chat')}
+              onNavigateToChat={handleOpenSupportBot}
               onNavigateToFaq={() => setSubView('faq')}
               onNavigateHome={() => {
                 setSubView(null);
@@ -211,7 +238,7 @@ const AppContent = () => {
           <PanelInicio
             onNavigateToSystems={() => setActiveTab(2)}
             onNavigateToReports={() => setSubView('faq')}
-            onNavigateToChat={() => setSubView('chat')}
+            onNavigateToChat={handleOpenSupportBot}
             onNavigateToServices={() => setSubView('contact')}
           />
         );
@@ -298,7 +325,7 @@ const AppContent = () => {
           {/* Cabecera Estilizada Fija en la Cima */}
           <Encabezado
             title={getHeaderTitle()}
-            showBack={isSubViewActive}
+            showBack={isSubViewActive && !(subView === 'chat' && botStage === 'chat')}
             onBack={handleBack}
             onOpenNotifications={() => setSubView('notifications')}
             onOpenProfile={() => {
@@ -331,9 +358,14 @@ const AppContent = () => {
             </AnimatePresence>
           </main>
 
-          {/* Botón Flotante (FAB) Rive de Soporte IA en Inicio */}
-          {activeTab === 0 && !isSubViewActive && (
-            <BotonFlotanteSoporteIA onClick={() => setSubView('chat')} />
+          {/* Botón Flotante (FAB) Rive de Soporte IA en Inicio (Etapa 1: 'home') */}
+          {botStage === 'home' && activeTab === 0 && !isSubViewActive && (
+            <BotonFlotanteSoporteIA
+              activeTab={activeTab}
+              subView={subView}
+              botStage={botStage}
+              onClick={handleOpenSupportBot}
+            />
           )}
 
           {/* Barra de Navegación con Notch Elevado */}

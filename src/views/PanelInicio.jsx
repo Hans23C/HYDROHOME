@@ -3,12 +3,9 @@ import { motion } from 'motion/react';
 import {
   Home as HomeIcon,
   Power,
-  FileText,
-  Headphones,
-  Wrench,
+  AlertTriangle,
   ShieldCheck,
   Truck,
-  ArrowRight,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { AnimacionNivelCisterna } from '../components/animations/AnimacionNivelCisterna';
@@ -87,7 +84,7 @@ export const PanelInicio = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-white dark:bg-[#07131F] rounded-t-[36px] min-h-[calc(100dvh-100px)] px-5 sm:px-6 pt-6 pb-32 sm:pb-36 shadow-xl transition-colors space-y-6 sm:space-y-7 no-scrollbar">
+    <div className="flex-1 flex flex-col bg-white dark:bg-[#07131F] rounded-t-[36px] min-h-[calc(100dvh-100px)] px-5 sm:px-6 pt-6 pb-28 shadow-xl transition-colors space-y-6 sm:space-y-7 no-scrollbar">
       {/* ============================================================== */}
       {/* 1. SECCIÓN DE BIENVENIDA                                       */}
       {/* ============================================================== */}
@@ -172,16 +169,16 @@ export const PanelInicio = ({
         </h3>
 
         <div className="grid grid-cols-3 gap-3">
-          {/* Módulo 1: Limpieza */}
+          {/* Módulo 1: Incidencias (Averías en Tuberías) */}
           <div
             onClick={onNavigateToReports}
             className="flex flex-col items-center text-center gap-2 cursor-pointer group"
           >
-            <div className="w-14 h-14 rounded-full bg-[#E6FFFB] dark:bg-emerald-950/40 text-emerald-500 flex items-center justify-center group-hover:scale-105 transition-transform shadow-xs">
-              <Wrench className="w-6 h-6" />
+            <div className="w-14 h-14 rounded-full bg-[#FFF4E6] dark:bg-amber-950/40 text-amber-500 flex items-center justify-center group-hover:scale-105 transition-transform shadow-xs">
+              <AlertTriangle className="w-6 h-6" />
             </div>
             <span className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 leading-snug break-words whitespace-normal">
-              Limpieza
+              Incidencias
             </span>
           </div>
 
@@ -224,77 +221,6 @@ export const PanelInicio = ({
         />
 
         <AnimacionFlujoAgua initialFlowing={pumpActive} />
-      </div>
-
-      {/* ============================================================== */}
-      {/* 5. BANNERS DE ACCIÓN (DEBAJO DE MÓDULOS, SIN ALTURAS FIJAS)    */}
-      {/* ============================================================== */}
-      <div className="pt-2">
-        <h3 className="font-black text-base sm:text-lg text-slate-900 dark:text-white mb-4">
-          Accesos Rápidos y Servicios
-        </h3>
-
-        <div className="grid grid-cols-1 gap-5">
-          {/* Tarjeta 1 (Morada): Registro Histórico */}
-          <motion.div
-            whileHover={{ y: -2 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={onNavigateToReports}
-            className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-[#8B5CF6] to-[#6D28D9] text-white flex items-center justify-between gap-4 shadow-md shadow-purple-500/20 cursor-pointer transition"
-          >
-            <div className="flex-1 min-w-0 space-y-2.5">
-              <span className="inline-block text-[11px] font-black px-3 py-1 rounded-full bg-white/20 backdrop-blur-md uppercase tracking-wider">
-                Auditoría Hídrica
-              </span>
-              <h4 className="text-lg sm:text-xl font-black leading-snug break-words whitespace-normal">
-                Registro Histórico
-              </h4>
-              <p className="text-sm text-purple-100 font-medium leading-snug break-words whitespace-normal">
-                Consulta de bitácoras, consumo diario y mantenimiento.
-              </p>
-              <div className="pt-1">
-                <span className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-black bg-white text-[#6D28D9] px-4 py-2 rounded-xl shadow-xs hover:bg-purple-50 transition">
-                  <span>Solicitar Bitácora</span>
-                  <ArrowRight className="w-4 h-4 shrink-0" />
-                </span>
-              </div>
-            </div>
-
-            <div className="w-16 h-16 rounded-2xl bg-white/15 flex items-center justify-center shrink-0">
-              <FileText className="w-8 h-8 text-white fill-white/20" />
-            </div>
-          </motion.div>
-
-          {/* Tarjeta 2 (Azul): Soporte Técnico */}
-          <motion.div
-            whileHover={{ y: -2 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={onNavigateToServices}
-            className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-[#00C2FF] to-[#0284C7] text-white flex items-center justify-between gap-4 shadow-md shadow-[#00C2FF]/20 cursor-pointer transition"
-          >
-            <div className="flex-1 min-w-0 space-y-2.5">
-              <span className="inline-block text-[11px] font-black px-3 py-1 rounded-full bg-white/20 backdrop-blur-md uppercase tracking-wider">
-                Asistencia 24/7
-              </span>
-              <h4 className="text-lg sm:text-xl font-black leading-snug break-words whitespace-normal">
-                Soporte Técnico
-              </h4>
-              <p className="text-sm text-sky-100 font-medium leading-snug break-words whitespace-normal">
-                Asistencia técnica para reportar fugas, fallos de sensor y presión.
-              </p>
-              <div className="pt-1">
-                <span className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-black bg-white text-[#0284C7] px-4 py-2 rounded-xl shadow-xs hover:bg-sky-50 transition">
-                  <span>Contactar Servicios</span>
-                  <ArrowRight className="w-4 h-4 shrink-0" />
-                </span>
-              </div>
-            </div>
-
-            <div className="w-16 h-16 rounded-2xl bg-white/15 flex items-center justify-center shrink-0">
-              <Headphones className="w-8 h-8 text-white" />
-            </div>
-          </motion.div>
-        </div>
       </div>
     </div>
   );

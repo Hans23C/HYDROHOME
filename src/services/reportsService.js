@@ -1,51 +1,54 @@
-// Servicio de Bitácora Residencial & Asistencia Técnica Hogar
-const STORAGE_KEY_REPORTS = 'hydro_home_services_v1';
+// Servicio de Bitácora Técnica de Incidencias y Averías en Tuberías
+const STORAGE_KEY_REPORTS = 'hydro_pipe_incidents_v1';
 
-const SERVICIOS_INICIALES = [
+const INCIDENCIAS_INICIALES = [
   {
-    id: 'SRV-101',
-    title: 'Limpieza y Desinfección Anual de Cisterna (5,000 L)',
+    id: 'INC-101',
+    title: 'Fisura en Codo de PVC Hidráulico (Línea Principal)',
     systemName: 'Casa Principal',
-    category: 'Cisterna y Almacenamiento',
-    description: 'Lavado a presión de muros de cisterna, vaciado de sedimentos y cloración preventiva según norma sanitaria.',
-    severity: 'Programado',
+    category: 'Tubería Principal',
+    description:
+      'Caída súbita de presión detectada por el sensor ESP32 (de 3.2 bar a 1.4 bar). Se localizó filtración en unión de tubería de 1/2 pulgada en patio trasero.',
+    severity: 'Alta',
     author: 'Jesús Vásquez Granda',
-    date: '2026-11-08',
-    time: '10:00 AM',
-    createdAt: '08/11/2026, 10:00 AM',
-    status: 'Concluido',
-    technicianNotes: 'Cisterna desinfectada al 100%. Llenado completado. Se dejó válvula en servicio normal.',
-    technicianName: 'Téc. Fernando Ruiz (AquaCare Domicilio)',
+    date: '2026-11-14',
+    time: '09:40 AM',
+    createdAt: '14/11/2026, 09:40 AM',
+    status: 'En Revisión',
+    technicianName: 'Plomero Héctor Méndez',
+    stateDetail: 'Reparación en curso',
   },
   {
-    id: 'SRV-102',
-    title: 'Mantenimiento Preventivo de Bomba Presurizadora',
+    id: 'INC-102',
+    title: 'Obstrucción por Sarro en Válvula Check de Bomba',
     systemName: 'Casa Principal',
-    category: 'Bomba y Presión',
-    description: 'Revisión de capacitor de arranque, engrase de baleros y calibración de presostato a 3.2 bar.',
-    severity: 'Mantenimiento',
+    category: 'Válvulas y Bomba',
+    description:
+      'Flujo reducido a 2 L/min con bomba activa. Se realizó desarme, limpieza de sedimentos calcáreos y sustitución de empaque de retención.',
+    severity: 'Media',
     author: 'Jesús Vásquez Granda',
-    date: '2026-11-06',
-    time: '03:30 PM',
-    createdAt: '06/11/2026, 03:30 PM',
-    status: 'Concluido',
-    technicianNotes: 'Bomba operando silenciosamente. Presión estabilizada a 3.2 bar en regaderas y cocina.',
-    technicianName: 'Téc. Fernando Ruiz (AquaCare Domicilio)',
+    date: '2026-10-28',
+    time: '04:15 PM',
+    createdAt: '28/10/2026, 04:15 PM',
+    status: 'Reparado',
+    technicianName: 'Téc. Fernando Ruiz',
+    stateDetail: 'Presión restablecida a 3.1 bar',
   },
   {
-    id: 'SRV-103',
-    title: 'Reemplazo de Filtro de Sedimentos de Entrada Principal',
-    systemName: 'Casa de Campo / Vacacional',
-    category: 'Filtración y Calidad',
-    description: 'Sustitución de cartucho polipropileno de 20 micras para retención de tierra y arena de la red pública.',
-    severity: 'Preventivo',
+    id: 'INC-103',
+    title: 'Desacople en Tubería de Alimentación a Tinaco',
+    systemName: 'Casa Principal',
+    category: 'Alimentación y Tinaco',
+    description:
+      'Sobrepresión por golpe de ariete provocó desprendimiento en conector roscado superior. Se reforzó con termofusión y válvula reguladora.',
+    severity: 'Alta',
     author: 'Jesús Vásquez Granda',
-    date: '2026-11-02',
-    time: '11:15 AM',
-    createdAt: '02/11/2026, 11:15 AM',
-    status: 'Concluido',
-    technicianNotes: 'Filtro nuevo instalado con sello hermético. Manómetro marca 0.1 bar de caída nominal.',
-    technicianName: 'Téc. Marco Valdés',
+    date: '2026-09-19',
+    time: '11:20 AM',
+    createdAt: '19/09/2026, 11:20 AM',
+    status: 'Reparado',
+    technicianName: 'Téc. Fernando Ruiz',
+    stateDetail: 'Red sellada sin fugas',
   },
 ];
 
@@ -63,7 +66,7 @@ export const formatearCabeceraDia = (dateStr) => {
   const dias = ['DOMINGO', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO'];
   const meses = [
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
   ];
 
   return {
@@ -79,7 +82,9 @@ export const agruparReportesPorDia = (listaReportes) => {
   const grupos = {};
 
   (listaReportes || []).forEach((reporte) => {
-    const fechaClave = reporte.date || (reporte.createdAt ? reporte.createdAt.substring(0, 10) : '2026-11-06');
+    const fechaClave =
+      reporte.date ||
+      (reporte.createdAt ? reporte.createdAt.substring(0, 10) : '2026-11-14');
     if (!grupos[fechaClave]) {
       grupos[fechaClave] = [];
     }
@@ -103,10 +108,10 @@ export const obtenerReportes = () => {
       if (Array.isArray(parsed) && parsed.length > 0) return parsed;
     }
   } catch (e) {
-    console.error('Error al leer bitácora residencial:', e);
+    console.error('Error al leer bitácora de incidencias:', e);
   }
-  localStorage.setItem(STORAGE_KEY_REPORTS, JSON.stringify(SERVICIOS_INICIALES));
-  return SERVICIOS_INICIALES;
+  localStorage.setItem(STORAGE_KEY_REPORTS, JSON.stringify(INCIDENCIAS_INICIALES));
+  return INCIDENCIAS_INICIALES;
 };
 
 export const guardarReporte = (nuevo) => {
@@ -117,19 +122,19 @@ export const guardarReporte = (nuevo) => {
   const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   const item = {
-    id: `SRV-${nextNum}`,
+    id: `INC-${nextNum}`,
     title: nuevo.title,
     systemName: nuevo.systemName || 'Casa Principal',
-    category: nuevo.category || 'Mantenimiento General',
+    category: nuevo.category || 'Tubería Principal',
     description: nuevo.description,
-    severity: nuevo.severity || 'Solicitado',
-    author: nuevo.author || 'Propietario',
+    severity: nuevo.severity || 'Alta',
+    author: nuevo.author || 'Jesús Vásquez Granda',
     date: dateStr,
     time: timeStr,
     createdAt: `${now.toLocaleDateString()}, ${timeStr}`,
-    status: 'Solicitado',
-    technicianNotes: 'Solicitud agendada en sistema. Se asignará especialista técnico domiciliario.',
+    status: 'En Revisión',
     technicianName: 'Por asignar',
+    stateDetail: 'Inspección técnica programada',
   };
 
   const listaActualizada = [item, ...actual];
@@ -143,12 +148,15 @@ export const responderReporte = (id, responseText, newStatus, techName) => {
   if (index === -1) return null;
 
   const now = new Date();
-  const dateStr = `${now.toLocaleDateString()}, ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+  const dateStr = `${now.toLocaleDateString()}, ${now.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+  })}`;
 
   const updated = {
     ...actual[index],
     status: newStatus || actual[index].status,
-    technicianNotes: responseText,
+    stateDetail: responseText,
     technicianName: techName || actual[index].technicianName,
     lastUpdate: dateStr,
   };
