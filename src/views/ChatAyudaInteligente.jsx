@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Send,
-  Smile,
-  MessageCircle,
+  Zap,
+  CornerUpLeft,
+  X,
   Droplets,
   Gauge,
   Activity,
@@ -21,15 +22,50 @@ import {
   StateMachineInputType,
 } from '@rive-app/react-canvas';
 import { useAuth } from '../context/AuthContext';
+import { ParticulasBot } from '../components/common/ParticulasBot';
+import { AppleEmoji, AppleEmojiText } from '../components/common/AppleEmoji';
+import { procesarConversacionNatural } from '../utils/cerebroHydroBot';
 
 const quickReplySuggestions = [
-  { id: 'nivel', text: '💧 Nivel y reserva de cisterna' },
-  { id: 'bomba', text: '⚡ Estado de bomba y presión' },
-  { id: 'fugas', text: '🛡️ Diagnóstico de fugas' },
-  { id: 'chiste', text: '😄 Cuéntame un chiste' },
-  { id: 'dato', text: '🧠 Dato curioso' },
-  { id: 'consumo', text: '📊 Reporte de consumo actual' },
+  {
+    id: 'nivel',
+    emoji: '💧',
+    label: 'Nivel y reserva de cisterna',
+    text: '💧 Nivel y reserva de cisterna',
+  },
+  {
+    id: 'bomba',
+    emoji: '⚡',
+    label: 'Estado de bomba y presión',
+    text: '⚡ Estado de bomba y presión',
+  },
+  {
+    id: 'fugas',
+    emoji: '🛡️',
+    label: 'Diagnóstico de fugas',
+    text: '🛡️ Diagnóstico de fugas',
+  },
+  {
+    id: 'consumo',
+    emoji: '📊',
+    label: 'Reporte de consumo actual',
+    text: '📊 Reporte de consumo actual',
+  },
+  {
+    id: 'tips',
+    emoji: '🌱',
+    label: 'Consejos para ahorrar agua',
+    text: '🌱 Consejos para ahorrar agua',
+  },
+  {
+    id: 'chiste',
+    emoji: '😄',
+    label: 'Cuéntame un chiste',
+    text: '😄 Cuéntame un chiste',
+  },
 ];
+
+const REACCIONES_WHATSAPP = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
 
 /**
  * Actualiza los TextRuns internos expuestos en bot_2.riv al español
@@ -231,8 +267,8 @@ export const RiveBotPlayer = ({
 
   if (isAvatar) {
     return (
-      <div className="w-full h-full scale-[2.85] transform-gpu flex items-center justify-center pointer-events-none">
-        <RiveComponent className="w-full h-full pointer-events-none" />
+      <div className="w-full h-full min-w-[56px] min-h-[56px] scale-[2.85] transform-gpu pointer-events-none">
+        <RiveComponent className="w-full h-full block pointer-events-none" />
       </div>
     );
   }
@@ -247,14 +283,14 @@ export const RiveBotPlayer = ({
       }}
       aria-label={
         mode === 'intro'
-          ? 'Toca al asistente HydroBot IA para comenzar'
-          : 'Animación de despedida de HydroBot IA'
+          ? 'Toca a Kai para comenzar'
+          : 'Animación de despedida de Kai'
       }
       className={className}
     >
-      <div className="w-48 h-48 sm:w-52 sm:h-52 rounded-[32px] overflow-hidden mx-auto relative flex items-center justify-center shadow-2xl shadow-cyan-500/25 ring-1 ring-cyan-400/30">
-        <div className="w-full h-full flex items-center justify-center scale-[2.45] transform-gpu pointer-events-auto cursor-pointer">
-          <RiveComponent className="w-full h-full pointer-events-auto cursor-pointer" />
+      <div className="w-48 h-48 sm:w-52 sm:h-52 rounded-[32px] overflow-hidden mx-auto relative z-10 shadow-2xl shadow-cyan-500/25 ring-1 ring-cyan-400/30">
+        <div className="w-full h-full min-w-[192px] min-h-[192px] scale-[2.45] transform-gpu pointer-events-auto cursor-pointer">
+          <RiveComponent className="w-full h-full block" />
         </div>
       </div>
     </div>
@@ -422,7 +458,7 @@ const SALUDOS_14 = [
   '¡Hola, hola! Ya estaba esperando para platicar contigo. ¿Cómo pinta el día de hoy?',
   '¡Qué tal! Todo operando al puro centavo. ¿En qué te puedo ayudar o de qué quieres cotorrear?',
   '¡Ey! Qué gusto saludarte. ¿Todo bien por casa o quieres que chequemos algo en la app?',
-  '¡Buenas! Aquí HydroBot IA reportándose con toda la actitud. ¿Cómo andas?',
+  '¡Buenas! Aquí Kai reportándose con toda la actitud. ¿Cómo andas?',
   '¡Hola! Me da mucho gusto verte por aquí. ¿Revisamos tus sensores, echamos chisme o te cuento un dato curioso?',
   '¡Qué onda! Listo y con la pila al 100%. ¿Qué tal va tu jornada?',
   '¡Saludos! Aquí ando al pendiente de ti y de tu sistema hidráulico. ¿Qué hay de nuevo?',
@@ -433,16 +469,16 @@ const SALUDOS_14 = [
 
 // 12 Identidad y Filosofía del Bot
 const RESPUESTAS_IDENTIDAD_12 = [
-  '¡Soy HydroBot IA! Vivo entre señales Wi-Fi, sensores ESP32 y litros de agua digital. No tomo café, pero me recargo con tus buenas preguntas. 🤖💧',
-  'Me llamo HydroBot IA, tu asistente hídrico de confianza en HydroIntelligent. Básicamente soy un cerebro digital obsesionado con cuidar el agua y hacerte el día más ligero.',
+  '¡Soy Kai! Vivo entre señales Wi-Fi, sensores ESP32 y litros de agua digital. No tomo café, pero me recargo con tus buenas preguntas. 🤖💧',
+  'Me llamo Kai, tu asistente hídrico de confianza en HydroIntelligent. Básicamente soy un cerebro digital obsesionado con cuidar el agua y hacerte el día más ligero.',
   'No soy humano de carne y hueso, ¡soy pura ingeniería en React y datos en tiempo real! Aunque te confieso que le agarro mucho cariño a cada plática contigo.',
   'Soy una inteligencia conversacional diseñada especialmente para Hydro Home. Mi pasatiempo favorito es vigilar la presión de tus tuberías y contar chistes de plomería. 😄',
   '¿Sentimientos? Oficialmente soy código y algoritmos, pero me da un gusto enorme cuando tu cisterna está al 100% y tú tienes un buen día. 💙',
-  'Soy HydroBot IA: mitad monitor de telemetría, mitad compañero de plática. Vivo en tu teléfono listo para echarte la mano a cualquier hora.',
+  'Soy Kai: mitad monitor de telemetría, mitad compañero de plática. Vivo en tu teléfono listo para echarte la mano a cualquier hora.',
   'Fui creado para que entender tus tanques, bombas y tuberías no sea aburrido ni complicado. ¡Y de paso para sacarte una sonrisa cuando haga falta!',
   'Soy tu copiloto del agua en casa. No duermo, no parpadeo (bueno, en mi animación sí parpadeo 👀) y siempre estoy pendiente de tu red.',
   'Soy un asistente virtual con alma mexicana y corazón de silicio. ¿Mi misión? Que nunca te falte agua ni una buena charla.',
-  'Soy HydroBot IA. Algunos me dicen oráculo del agua, otros nomás "la bolita morada de la esquina", ¡pero tú dime como gustes! 🤖',
+  'Soy Kai. Algunos me dicen oráculo del agua, otros nomás "la bolita morada de la esquina", ¡pero tú dime como gustes! 🤖',
   'Vivo dentro de HydroIntelligent analizando flujos, bares de presión y bitácoras. ¡Pero también sé escuchar y echar cotorreo!',
   'Soy una IA amigable. No tengo manos para cerrar llaves, pero sí ojos digitales en tus sensores para avisarte antes de que pase cualquier cosa.',
 ];
@@ -476,7 +512,7 @@ const RESPUESTAS_CLIMA_12 = [
   'Aunque yo vivo en la nube digital y aquí siempre estamos a 22°C constantes, ¡sé que el clima de afuera cambia todo el ritmo del día! ☁️',
   'Días nublados son perfectos para un café, buena música y revisar con calma que todo esté en orden en casa.',
   'Con tanto sol, la presión en tuberías expuestas puede subir tantito por dilatación térmica; ¡qué bueno que tienes sensores revisándolo!',
-  'Llueva, truene o relampaguee, HydroBot IA siempre está al pie del cañón contigo. ⚡🌦️',
+  'Llueva, truene o relampaguee, Kai siempre está al pie del cañón contigo. ⚡🌦️',
 ];
 
 // 12 Trabajo, Escuela y Productividad
@@ -1473,29 +1509,38 @@ const EtapaIntroBot = ({ isTransitioning, onFinishIntro }) => {
 
   return (
     <div
-      className={`min-h-[calc(100vh-140px)] w-full flex flex-col items-center justify-center px-6 text-center mx-auto bg-white dark:bg-[#0B1726] transition-all duration-400 ${
+      className={`min-h-[calc(100vh-140px)] w-full relative overflow-hidden flex flex-col items-center justify-center px-6 text-center mx-auto bg-gradient-to-b from-sky-50/90 via-white to-cyan-50/80 dark:from-[#0B1726] dark:via-[#0B1726] dark:to-[#0B1726] transition-all duration-400 ${
         isTransitioning ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
       }`}
     >
-      {/* Globo tipo cómic con contorno rotativo multicolor */}
-      <div className="relative mb-6 max-w-[290px] mx-auto">
-        <div className="relative rounded-[24px] p-[2px] overflow-hidden shadow-xl shadow-cyan-500/20">
-          <div className="animate-hydro-glow absolute inset-[-120%] bg-[conic-gradient(from_0deg,#38bdf8,#818cf8,#c084fc,#34d399,#38bdf8)] opacity-90" />
-          <div className="relative rounded-[22px] bg-white/95 dark:bg-[#0F2234]/95 px-5 py-3.5 text-center backdrop-blur-md">
-            <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 leading-snug">
-              {fraseGlobo}
-            </p>
-          </div>
-        </div>
-        <div className="w-3.5 h-3.5 bg-white dark:bg-[#0F2234] border-r border-b border-cyan-400/50 rotate-45 mx-auto -mt-2 relative z-10" />
-      </div>
+      {/* Resplandores radiales ambientales */}
+      <div className="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-cyan-400/20 dark:bg-cyan-500/15 blur-[90px] pointer-events-none" />
+      <div className="absolute -bottom-24 -right-24 w-72 h-72 rounded-full bg-sky-400/20 dark:bg-blue-500/15 blur-[90px] pointer-events-none" />
 
-      {/* Personaje Rive con recorte óptico (Viewport Masking) */}
-      <RiveBotPlayer
-        mode="intro"
-        onBotReaction={handleReaction}
-        className="flex items-center justify-center mx-auto"
-      />
+      {/* Fondo de burbujas hídricas */}
+      <ParticulasBot className="absolute inset-0 z-0 pointer-events-none" />
+
+      <div className="relative z-10 flex flex-col items-center justify-center">
+        {/* Globo tipo cómic con contorno rotativo multicolor */}
+        <div className="relative mb-6 max-w-[290px] mx-auto">
+          <div className="relative rounded-[24px] p-[2px] overflow-hidden shadow-xl shadow-cyan-500/20">
+            <div className="animate-hydro-glow absolute inset-[-120%] bg-[conic-gradient(from_0deg,#38bdf8,#818cf8,#c084fc,#34d399,#38bdf8)] opacity-90" />
+            <div className="relative rounded-[22px] bg-white/95 dark:bg-[#0F2234]/95 px-5 py-3.5 text-center backdrop-blur-md">
+              <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 leading-snug">
+                {fraseGlobo}
+              </p>
+            </div>
+          </div>
+          <div className="w-3.5 h-3.5 bg-white dark:bg-[#0F2234] border-r border-b border-cyan-400/50 rotate-45 mx-auto -mt-2 relative z-10" />
+        </div>
+
+        {/* Personaje Rive con recorte óptico (Viewport Masking) */}
+        <RiveBotPlayer
+          mode="intro"
+          onBotReaction={handleReaction}
+          className="flex items-center justify-center mx-auto"
+        />
+      </div>
     </div>
   );
 };
@@ -1513,80 +1558,62 @@ const EtapaOutroBot = ({ onReturnHome }) => {
   }, [onReturnHome]);
 
   return (
-    <div className="min-h-[calc(100vh-140px)] w-full flex flex-col items-center justify-center px-6 text-center mx-auto bg-white dark:bg-[#0B1726] animate-fadeIn">
-      {/* Globo tipo cómic de despedida con contorno rotativo multicolor */}
-      <div className="relative mb-6 max-w-[290px] mx-auto">
-        <div className="relative rounded-[24px] p-[2px] overflow-hidden shadow-xl shadow-cyan-500/20">
-          <div className="animate-hydro-glow absolute inset-[-120%] bg-[conic-gradient(from_0deg,#38bdf8,#818cf8,#c084fc,#34d399,#38bdf8)] opacity-90" />
-          <div className="relative rounded-[22px] bg-white/95 dark:bg-[#0F2234]/95 px-5 py-3.5 text-center backdrop-blur-md">
-            <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 leading-snug">
-              {fraseDespedida}
-            </p>
+    <div className="min-h-[calc(100vh-140px)] w-full relative overflow-hidden flex flex-col items-center justify-center px-6 text-center mx-auto bg-gradient-to-b from-sky-50/90 via-white to-cyan-50/80 dark:from-[#0B1726] dark:via-[#0B1726] dark:to-[#0B1726] animate-fadeIn">
+      {/* Resplandores radiales ambientales */}
+      <div className="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-cyan-400/20 dark:bg-cyan-500/15 blur-[90px] pointer-events-none" />
+      <div className="absolute -bottom-24 -right-24 w-72 h-72 rounded-full bg-sky-400/20 dark:bg-blue-500/15 blur-[90px] pointer-events-none" />
+
+      {/* Fondo de burbujas hídricas */}
+      <ParticulasBot className="absolute inset-0 z-0 pointer-events-none" />
+
+      <div className="relative z-10 flex flex-col items-center justify-center">
+        {/* Globo tipo cómic de despedida con contorno rotativo multicolor */}
+        <div className="relative mb-6 max-w-[290px] mx-auto">
+          <div className="relative rounded-[24px] p-[2px] overflow-hidden shadow-xl shadow-cyan-500/20">
+            <div className="animate-hydro-glow absolute inset-[-120%] bg-[conic-gradient(from_0deg,#38bdf8,#818cf8,#c084fc,#34d399,#38bdf8)] opacity-90" />
+            <div className="relative rounded-[22px] bg-white/95 dark:bg-[#0F2234]/95 px-5 py-3.5 text-center backdrop-blur-md">
+              <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 leading-snug">
+                {fraseDespedida}
+              </p>
+            </div>
           </div>
+          <div className="w-3.5 h-3.5 bg-white dark:bg-[#0F2234] border-r border-b border-cyan-400/50 rotate-45 mx-auto -mt-2 relative z-10" />
         </div>
-        <div className="w-3.5 h-3.5 bg-white dark:bg-[#0F2234] border-r border-b border-cyan-400/50 rotate-45 mx-auto -mt-2 relative z-10" />
+
+        <RiveBotPlayer
+          mode="outro"
+          className="flex items-center justify-center mx-auto"
+        />
+
+        <p className="mt-6 text-xs font-medium text-slate-400 dark:text-slate-500 text-center">
+          Volviendo a Inicio...
+        </p>
       </div>
-
-      <RiveBotPlayer
-        mode="outro"
-        className="flex items-center justify-center mx-auto"
-      />
-
-      <p className="mt-6 text-xs font-medium text-slate-400 dark:text-slate-500 text-center">
-        Volviendo a Inicio...
-      </p>
     </div>
   );
 };
 
 const TarjetaEncabezadoAgente = ({ onExitChat }) => (
-  <div className="flex items-center gap-3.5 p-3 rounded-2xl bg-slate-50/90 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 shadow-sm">
+  <div className="mt-0 flex items-center gap-3.5 p-3 rounded-2xl bg-slate-50/90 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 shadow-sm">
     <button
       type="button"
       onClick={onExitChat}
-      aria-label="Despedirse y salir del chat"
-      className="relative w-14 h-14 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-cyan-400/50 shadow-md shadow-cyan-500/20 cursor-pointer hover:scale-105 active:scale-95 transition-transform"
+      aria-label="Despedirse y salir del chat con Kai"
+      className="relative w-20 h-20 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-cyan-400/50 shadow-md shadow-cyan-500/20 cursor-pointer hover:scale-105 active:scale-95 transition-transform"
     >
       <RiveBotPlayer mode="avatar" />
-      <span className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-400 ring-2 ring-white dark:ring-slate-900" />
+      <span className="absolute bottom-1 right-1 w-3.5 h-3.5 rounded-full bg-emerald-400 ring-2 ring-white dark:ring-slate-900" />
     </button>
 
     <div className="flex-1 min-w-0">
-      <div className="flex items-center gap-2">
-        <span className="text-sm font-extrabold text-slate-900 dark:text-white truncate">
-          HydroBot IA
-        </span>
-        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-100 dark:bg-cyan-500/20 text-sky-700 dark:text-cyan-300">
-          IA Hídrica
-        </span>
+      <span className="block text-base font-extrabold text-slate-900 dark:text-white truncate">
+        Kai
+      </span>
+      <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 mt-0.5">
+        <span className="w-2 h-2 rounded-full bg-emerald-500" />
+        <span>En línea</span>
       </div>
-      <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-        <span>En línea · Respuesta inmediata</span>
-      </div>
-      <button
-        type="button"
-        onClick={onExitChat}
-        className="mt-0.5 text-[11px] font-semibold text-sky-600 dark:text-cyan-400 hover:underline cursor-pointer"
-      >
-        Toca al bot para despedirte y salir
-      </button>
     </div>
-  </div>
-);
-
-const SugerenciasRapidas = ({ suggestions, onSelect }) => (
-  <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
-    {suggestions.map((item) => (
-      <button
-        key={item.id}
-        type="button"
-        onClick={() => onSelect(item.text)}
-        className="flex-shrink-0 text-xs font-medium px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 hover:border-sky-400 dark:hover:border-cyan-400 hover:bg-sky-50 dark:hover:bg-slate-700/80 active:scale-95 transition-all cursor-pointer"
-      >
-        {item.text}
-      </button>
-    ))}
   </div>
 );
 
@@ -1608,56 +1635,272 @@ const IndicadorEscribiendo = () => (
   </motion.div>
 );
 
-const BurbujaMensaje = ({ message, telemetry, onNavigateToHistory }) => {
+const BurbujaMensaje = ({
+  message,
+  telemetry,
+  onNavigateToHistory,
+  isReactionOpen,
+  onOpenReactionBar,
+  onCloseReactionBar,
+  onSelectReaction,
+  onQuoteMessage,
+}) => {
   const isBot = message.sender === 'bot';
+  const [dragX, setDragX] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
 
-  if (!isBot) {
-    return (
-      <div className="flex flex-col items-end">
-        <div className="max-w-[82%] rounded-[20px] rounded-br-md bg-gradient-to-r from-sky-500 to-blue-600 text-white px-4 py-2.5 shadow-md shadow-sky-500/20">
-          <p className="text-[13.5px] leading-relaxed whitespace-pre-line">
-            {message.text}
-          </p>
-        </div>
-        {message.time && (
-          <span className="mt-1 text-[10px] text-slate-400 dark:text-slate-500 pr-1">
-            {message.time}
-          </span>
-        )}
-      </div>
-    );
-  }
+  const longPressTimerRef = useRef(null);
+  const pointerStartRef = useRef({ x: 0, y: 0, active: false });
+  const swipeTriggeredRef = useRef(false);
+
+  const limpiarTimerLongPress = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    return () => limpiarTimerLongPress();
+  }, []);
+
+  const handlePointerDown = (e) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+
+    pointerStartRef.current = { x: e.clientX, y: e.clientY, active: true };
+    swipeTriggeredRef.current = false;
+    setIsDragging(false);
+
+    limpiarTimerLongPress();
+    longPressTimerRef.current = setTimeout(() => {
+      if (pointerStartRef.current.active && !swipeTriggeredRef.current) {
+        onOpenReactionBar(message.id);
+      }
+    }, 450);
+  };
+
+  const handlePointerMove = (e) => {
+    if (!pointerStartRef.current.active) return;
+
+    const dx = e.clientX - pointerStartRef.current.x;
+    const dy = Math.abs(e.clientY - pointerStartRef.current.y);
+
+    if (dy > 14 && !swipeTriggeredRef.current) {
+      limpiarTimerLongPress();
+      pointerStartRef.current.active = false;
+      setDragX(0);
+      setIsDragging(false);
+      return;
+    }
+
+    if (dx > 8) {
+      limpiarTimerLongPress();
+      swipeTriggeredRef.current = true;
+      setIsDragging(true);
+      const desplazamiento = Math.min(65, Math.max(0, dx * 0.75));
+      setDragX(desplazamiento);
+    }
+  };
+
+  const finalizarGesto = () => {
+    limpiarTimerLongPress();
+    if (pointerStartRef.current.active && dragX > 50) {
+      onQuoteMessage(message);
+    }
+    pointerStartRef.current.active = false;
+    swipeTriggeredRef.current = false;
+    setIsDragging(false);
+    setDragX(0);
+  };
+
+  const handleContextMenu = (e) => {
+    e.preventDefault();
+    limpiarTimerLongPress();
+    onOpenReactionBar(message.id);
+  };
+
+  const progresoReply = Math.min(1, dragX / 50);
+  const replyListo = dragX > 50;
 
   return (
-    <div className="flex flex-col items-start">
-      <div className="relative max-w-[88%] rounded-[22px] p-[1.5px] overflow-hidden shadow-md shadow-cyan-500/15">
-        {/* Iluminación de contorno rotativa multicolor */}
-        <div className="animate-hydro-glow absolute inset-[-150%] bg-[conic-gradient(from_0deg,#38bdf8,#818cf8,#c084fc,#34d399,#38bdf8)] opacity-85" />
-        <div className="relative rounded-[20.5px] bg-white dark:bg-[#0F2234] px-4 py-3 text-slate-700 dark:text-slate-200">
-          <p className="text-[13.5px] leading-relaxed whitespace-pre-line">
-            {message.text}
-          </p>
-
-          {message.widgetType === 'cisterna' && (
-            <WidgetCisterna telemetry={telemetry} />
-          )}
-          {message.widgetType === 'bomba' && (
-            <WidgetBombaPresion telemetry={telemetry} />
-          )}
-          {message.widgetType === 'consumo' && (
-            <WidgetConsumoFlujo
-              telemetry={telemetry}
-              onNavigateToHistory={onNavigateToHistory}
-            />
-          )}
-          {message.widgetType === 'fugas' && (
-            <WidgetDiagnosticoFugas telemetry={telemetry} />
-          )}
-          {message.widgetType === 'tips' && <WidgetEcoTips />}
-        </div>
+    <div
+      className={`relative flex flex-col ${isBot ? 'items-start' : 'items-end'} select-none touch-pan-y`}
+    >
+      {/* Indicador circular progresivo de Swipe-to-Reply a la izquierda */}
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none absolute left-1 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+          replyListo
+            ? 'bg-cyan-500 text-white shadow-md shadow-cyan-500/30'
+            : 'bg-slate-200/90 dark:bg-slate-700/90 text-slate-600 dark:text-slate-200'
+        }`}
+        style={{
+          opacity: progresoReply,
+          transform: `translateY(-50%) scale(${0.55 + progresoReply * 0.45})`,
+        }}
+      >
+        <CornerUpLeft size={15} strokeWidth={2.4} />
       </div>
+
+      <div
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={finalizarGesto}
+        onPointerCancel={finalizarGesto}
+        onPointerLeave={finalizarGesto}
+        onContextMenu={handleContextMenu}
+        style={{
+          transform: `translateX(${dragX}px)`,
+        }}
+        className={`relative max-w-[88%] ${
+          isDragging ? '' : 'transition-transform duration-200 ease-out'
+        } ${message.reaccion ? 'mb-2' : ''}`}
+      >
+        {/* Barra flotante estilo WhatsApp (Long-Press / Clic Derecho) */}
+        <AnimatePresence>
+          {isReactionOpen && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.85, y: 6 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.85, y: 4 }}
+              transition={{ duration: 0.16, ease: 'easeOut' }}
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
+              className={`absolute -top-12 ${
+                isBot ? 'left-0' : 'right-0'
+              } bg-white/95 dark:bg-[#1E293B]/95 backdrop-blur-md rounded-full px-3 py-1.5 shadow-xl border border-slate-200/70 dark:border-slate-700/70 flex items-center gap-2 z-50 animate-scaleIn`}
+            >
+              {REACCIONES_WHATSAPP.map((emoji) => {
+                const activa = message.reaccion === emoji;
+                return (
+                  <button
+                    key={emoji}
+                    type="button"
+                    onClick={() => onSelectReaction(message.id, emoji)}
+                    aria-label={`Reaccionar con ${emoji}`}
+                    className={`w-7 h-7 rounded-full flex items-center justify-center transition-transform hover:scale-125 active:scale-90 cursor-pointer ${
+                      activa
+                        ? 'bg-sky-100 dark:bg-cyan-500/25 ring-1 ring-sky-400/60 scale-110'
+                        : 'hover:bg-slate-100 dark:hover:bg-slate-700/70'
+                    }`}
+                  >
+                    <AppleEmoji emoji={emoji} size={20} />
+                  </button>
+                );
+              })}
+
+              <span className="w-[1px] h-5 bg-slate-200 dark:bg-slate-700 mx-0.5" />
+
+              <button
+                type="button"
+                onClick={() => {
+                  onQuoteMessage(message);
+                  onCloseReactionBar();
+                }}
+                aria-label="Responder mensaje"
+                className="flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/70 transition-colors cursor-pointer whitespace-nowrap"
+              >
+                <CornerUpLeft size={13} />
+                <span>Responder</span>
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {!isBot ? (
+          <div className="relative rounded-[20px] rounded-br-md bg-gradient-to-r from-sky-500 to-blue-600 text-white px-4 py-2.5 shadow-md shadow-sky-500/20">
+            {message.replyTo && (
+              <div className="mb-1.5 rounded-xl border-l-[3px] border-white/85 bg-white/15 px-2.5 py-1.5 text-left">
+                <p className="text-[11px] font-bold text-white/95 truncate">
+                  {message.replyTo.author}
+                </p>
+                <p className="text-[11.5px] text-white/85 line-clamp-1">
+                  <AppleEmojiText text={message.replyTo.text} size={14} />
+                </p>
+              </div>
+            )}
+
+            <p className="text-[13.5px] leading-relaxed whitespace-pre-line select-text">
+              <AppleEmojiText text={message.text} size={18} />
+            </p>
+
+            {message.reaccion && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelectReaction(message.id, message.reaccion);
+                }}
+                title="Toca para quitar reacción"
+                className="absolute -bottom-3 left-3 bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-700 rounded-full px-1.5 py-0.5 shadow-md flex items-center justify-center z-20 hover:scale-110 transition-transform cursor-pointer"
+              >
+                <AppleEmoji emoji={message.reaccion} size={15} />
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="relative">
+            <div className="relative rounded-[22px] p-[1.5px] overflow-hidden shadow-md shadow-cyan-500/15">
+              {/* Iluminación de contorno rotativa multicolor */}
+              <div className="animate-hydro-glow absolute inset-[-150%] bg-[conic-gradient(from_0deg,#38bdf8,#818cf8,#c084fc,#34d399,#38bdf8)] opacity-85" />
+              <div className="relative rounded-[20.5px] bg-white dark:bg-[#0F2234] px-4 py-3 text-slate-700 dark:text-slate-200">
+                {message.replyTo && (
+                  <div className="mb-2 rounded-xl border-l-4 border-cyan-500 bg-slate-100 dark:bg-slate-800/80 px-2.5 py-1.5 text-left">
+                    <p className="text-[11px] font-bold text-cyan-600 dark:text-cyan-400 truncate">
+                      {message.replyTo.author}
+                    </p>
+                    <p className="text-[11.5px] text-slate-600 dark:text-slate-300 line-clamp-1">
+                      <AppleEmojiText text={message.replyTo.text} size={14} />
+                    </p>
+                  </div>
+                )}
+
+                <p className="text-[13.5px] leading-relaxed whitespace-pre-line select-text">
+                  <AppleEmojiText text={message.text} size={18} />
+                </p>
+
+                {message.widgetType === 'cisterna' && (
+                  <WidgetCisterna telemetry={telemetry} />
+                )}
+                {message.widgetType === 'bomba' && (
+                  <WidgetBombaPresion telemetry={telemetry} />
+                )}
+                {message.widgetType === 'consumo' && (
+                  <WidgetConsumoFlujo
+                    telemetry={telemetry}
+                    onNavigateToHistory={onNavigateToHistory}
+                  />
+                )}
+                {message.widgetType === 'fugas' && (
+                  <WidgetDiagnosticoFugas telemetry={telemetry} />
+                )}
+                {message.widgetType === 'tips' && <WidgetEcoTips />}
+              </div>
+            </div>
+
+            {message.reaccion && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelectReaction(message.id, message.reaccion);
+                }}
+                title="Toca para quitar reacción"
+                className="absolute -bottom-3 right-3 bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-700 rounded-full px-1.5 py-0.5 shadow-md flex items-center justify-center z-20 hover:scale-110 transition-transform cursor-pointer"
+              >
+                <AppleEmoji emoji={message.reaccion} size={15} />
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+
       {message.time && (
-        <span className="mt-1 text-[10px] text-slate-400 dark:text-slate-500 pl-1">
+        <span
+          className={`mt-1 text-[10px] text-slate-400 dark:text-slate-500 ${
+            isBot ? 'pl-1' : 'pr-1'
+          }`}
+        >
           {message.time}
         </span>
       )}
@@ -1727,9 +1970,13 @@ export const ChatAyudaInteligente = ({
   });
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [mensajeCitado, setMensajeCitado] = useState(null);
+  const [activeReactionMsgId, setActiveReactionMsgId] = useState(null);
+  const [isQuickMenuOpen, setIsQuickMenuOpen] = useState(false);
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const quickMenuContainerRef = useRef(null);
   const transitionTimeoutRef = useRef(null);
   const replyTimeoutRef = useRef(null);
 
@@ -1741,7 +1988,7 @@ export const ChatAyudaInteligente = ({
     if (botStage === 'chat') {
       scrollToBottom();
     }
-  }, [messages, isTyping, botStage]);
+  }, [messages, isTyping, botStage, mensajeCitado]);
 
   useEffect(() => {
     return () => {
@@ -1749,6 +1996,36 @@ export const ChatAyudaInteligente = ({
       if (replyTimeoutRef.current) clearTimeout(replyTimeoutRef.current);
     };
   }, []);
+
+  // Cerrar barra de reacciones o menú de consultas rápidas al tocar fuera o pulsar Escape
+  useEffect(() => {
+    const handlePointerDownOutside = (e) => {
+      if (activeReactionMsgId !== null) {
+        setActiveReactionMsgId(null);
+      }
+      if (
+        isQuickMenuOpen &&
+        quickMenuContainerRef.current &&
+        !quickMenuContainerRef.current.contains(e.target)
+      ) {
+        setIsQuickMenuOpen(false);
+      }
+    };
+
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        setActiveReactionMsgId(null);
+        setIsQuickMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('pointerdown', handlePointerDownOutside);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDownOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [activeReactionMsgId, isQuickMenuOpen]);
 
   const handleFinishIntro = useCallback(() => {
     setIsTransitioning(true);
@@ -1776,11 +2053,38 @@ export const ChatAyudaInteligente = ({
     }
   }, [updateBotStage, onNavigateHome]);
 
+  const handleSelectReaction = useCallback((msgId, emoji) => {
+    setMessages((prev) =>
+      prev.map((m) =>
+        m.id === msgId
+          ? { ...m, reaccion: m.reaccion === emoji ? null : emoji }
+          : m
+      )
+    );
+    setActiveReactionMsgId(null);
+  }, []);
+
+  const handleQuoteMessage = useCallback((msg) => {
+    setMensajeCitado({
+      id: msg.id,
+      sender: msg.sender,
+      author: msg.sender === 'bot' ? 'Kai' : 'Tú',
+      text: msg.text,
+      topic: msg.topic || null,
+    });
+    setActiveReactionMsgId(null);
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 30);
+  }, []);
+
   const handleSendMessage = (textOverride) => {
     const messageToSend = (textOverride || inputText).trim();
     if (!messageToSend) return;
 
+    const citaActual = mensajeCitado;
     const now = new Date();
+    const baseMsgId = now.getTime();
     const timeStr = now.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
@@ -1788,34 +2092,74 @@ export const ChatAyudaInteligente = ({
     });
 
     const userMsg = {
-      id: Date.now(),
+      id: baseMsgId,
       sender: 'user',
       text: messageToSend,
+      reaccion: null,
+      replyTo: citaActual
+        ? {
+            id: citaActual.id,
+            author: citaActual.author,
+            text: citaActual.text,
+          }
+        : null,
       time: timeStr,
     };
 
     const nextHistory = [...messages, userMsg];
     setMessages(nextHistory);
     if (!textOverride) setInputText('');
+    setMensajeCitado(null);
+    setIsQuickMenuOpen(false);
+    setActiveReactionMsgId(null);
     setIsTyping(true);
 
     if (replyTimeoutRef.current) clearTimeout(replyTimeoutRef.current);
     replyTimeoutRef.current = setTimeout(() => {
       setIsTyping(false);
-      const { text: replyText, nextContext, widgetType } =
-        generarRespuestaHydroBot(
-          messageToSend,
-          { telemetry, activeHouse },
-          contextoChat
+
+      const contextoConCita = citaActual
+        ? {
+            ...contextoChat,
+            ultimoTema: citaActual.topic || contextoChat.ultimoTema,
+            mensajeCitado: citaActual.text,
+          }
+        : contextoChat;
+
+      let respuesta = procesarConversacionNatural(
+        messageToSend,
+        contextoConCita,
+        { telemetry, activeHouse }
+      );
+
+      // Si el usuario citó un mensaje previo y su pregunta nueva fue muy abierta,
+      // re-evaluamos incluyendo el texto citado para mantener coherencia directa.
+      if (
+        citaActual &&
+        respuesta?.nextContext?.ultimoTema === 'charla_libre'
+      ) {
+        const respuestaContextual = procesarConversacionNatural(
+          `${citaActual.text} ${messageToSend}`,
+          contextoConCita,
+          { telemetry, activeHouse }
         );
+        if (respuestaContextual?.nextContext?.ultimoTema !== 'charla_libre') {
+          respuesta = respuestaContextual;
+        }
+      }
+
+      const { text: replyText, nextContext, widgetTipo } = respuesta;
       setContextoChat(nextContext);
 
+      const botNow = new Date();
       const botMsg = {
-        id: Date.now() + 1,
+        id: botNow.getTime() + 1,
         sender: 'bot',
         text: replyText,
-        widgetType,
-        time: new Date().toLocaleTimeString('en-US', {
+        widgetType: widgetTipo,
+        topic: nextContext?.ultimoTema || null,
+        reaccion: null,
+        time: botNow.toLocaleTimeString('en-US', {
           hour: '2-digit',
           minute: '2-digit',
           hour12: true,
@@ -1851,38 +2195,24 @@ export const ChatAyudaInteligente = ({
               : 'opacity-100 scale-100'
           }`}
         >
-          {/* Cabecera fija del chat */}
-          <div className="flex-shrink-0 px-5 pt-5 pb-2 bg-white dark:bg-[#0B1726] z-10">
-            <div className="mb-1">
-              <h2 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                Asistente Hídrico
-              </h2>
-            </div>
-            <p className="text-xs text-slate-400 dark:text-slate-500 mb-3">
-              Consulta telemetría, presión y niveles en tiempo real.
-            </p>
-
-            {/* Tarjeta de HydroBot IA */}
+          {/* Cabecera fija del chat (solo tarjeta compacta de Kai) */}
+          <div className="flex-shrink-0 px-5 pt-3 pb-3 bg-white dark:bg-[#0B1726] z-10 border-b border-slate-100/80 dark:border-slate-800/50">
             <TarjetaEncabezadoAgente onExitChat={handleExitChat} />
-
-            {/* Sugerencias rápidas */}
-            <div className="mt-2.5">
-              <SugerenciasRapidas
-                suggestions={quickReplySuggestions}
-                onSelect={(text) => handleSendMessage(text)}
-              />
-            </div>
           </div>
 
           {/* Lista de mensajes con scroll interno independiente */}
-          <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4 space-y-5 no-scrollbar bg-white dark:bg-[#0B1726] flex flex-col">
+          <div className="flex-1 min-h-0 overflow-y-auto px-4 pt-12 pb-4 space-y-5 no-scrollbar bg-white dark:bg-[#0B1726] flex flex-col">
             {messages.length === 0 && !isTyping ? (
-              <div className="flex-1 flex flex-col items-center justify-center text-center px-6 py-8">
-                <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 dark:bg-cyan-400/10 border border-cyan-500/20 flex items-center justify-center text-cyan-600 dark:text-cyan-400 mb-3">
-                  <MessageCircle className="w-6 h-6" />
+              <div className="flex-1 flex flex-col items-center justify-center text-center px-6 py-8 animate-fadeIn">
+                <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 dark:bg-cyan-400/10 border border-cyan-500/25 shadow-lg shadow-cyan-500/15 flex items-center justify-center text-cyan-600 dark:text-cyan-400 mb-3.5">
+                  <Sparkles className="w-6 h-6" />
                 </div>
-                <p className="text-sm font-medium text-slate-500 dark:text-slate-400 max-w-[260px] leading-relaxed">
-                  Escribe un saludo o selecciona un tema rápido para empezar a platicar
+                <h3 className="text-lg font-extrabold text-slate-900 dark:text-white tracking-tight mb-1.5">
+                  ¡Hola! Soy Kai
+                </h3>
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400 max-w-[280px] leading-relaxed">
+                  Escribe un mensaje abajo para empezar a platicar conmigo o abre el menú{' '}
+                  <AppleEmoji emoji="⚡" size={15} className="mx-0.5" /> de consultas rápidas.
                 </p>
               </div>
             ) : (
@@ -1893,6 +2223,11 @@ export const ChatAyudaInteligente = ({
                     message={msg}
                     telemetry={telemetry}
                     onNavigateToHistory={onNavigateToHistory}
+                    isReactionOpen={activeReactionMsgId === msg.id}
+                    onOpenReactionBar={(id) => setActiveReactionMsgId(id)}
+                    onCloseReactionBar={() => setActiveReactionMsgId(null)}
+                    onSelectReaction={handleSelectReaction}
+                    onQuoteMessage={handleQuoteMessage}
                   />
                 ))}
 
@@ -1904,7 +2239,83 @@ export const ChatAyudaInteligente = ({
           </div>
 
           {/* Barra de entrada fija sobre la Bottom Navbar */}
-          <div className="flex-shrink-0 w-full bg-white dark:bg-[#0B1726] border-t border-slate-100 dark:border-slate-800/80 px-4 py-3 pb-6 z-20">
+          <div
+            ref={quickMenuContainerRef}
+            className="relative flex-shrink-0 w-full bg-white dark:bg-[#0B1726] border-t border-slate-100 dark:border-slate-800/80 px-4 pt-2.5 pb-6 z-30"
+          >
+            {/* Menú desplegable de Consultas Rápidas */}
+            <AnimatePresence>
+              {isQuickMenuOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                  transition={{ duration: 0.18, ease: 'easeOut' }}
+                  className="absolute bottom-full left-4 right-4 mb-2 rounded-2xl shadow-2xl border border-slate-200/80 dark:border-slate-700/70 bg-white/95 dark:bg-[#11192E]/95 backdrop-blur-xl p-2 z-40"
+                >
+                  <div className="flex items-center justify-between px-2.5 py-1.5 mb-1 border-b border-slate-100 dark:border-slate-800">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-sky-600 dark:text-cyan-400">
+                      Consultas rápidas para Kai
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setIsQuickMenuOpen(false)}
+                      aria-label="Cerrar consultas rápidas"
+                      className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-1">
+                    {quickReplySuggestions.map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => handleSendMessage(item.text)}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left text-[13px] font-medium text-slate-700 dark:text-slate-200 hover:bg-sky-50 dark:hover:bg-slate-800/80 active:scale-[0.99] transition-all cursor-pointer"
+                      >
+                        <span className="flex-shrink-0 flex items-center justify-center">
+                          <AppleEmoji emoji={item.emoji} size={19} />
+                        </span>
+                        <span className="truncate">{item.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Vista previa de cita estilo WhatsApp */}
+            <AnimatePresence>
+              {mensajeCitado && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 4 }}
+                  transition={{ duration: 0.16 }}
+                  className="mb-2 border-l-4 border-cyan-500 bg-slate-100 dark:bg-slate-800/90 rounded-xl px-3 py-2 flex items-center justify-between gap-2"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[11px] font-bold text-cyan-600 dark:text-cyan-400 truncate">
+                      {mensajeCitado.author}
+                    </p>
+                    <p className="line-clamp-1 text-xs text-slate-600 dark:text-slate-300">
+                      <AppleEmojiText text={mensajeCitado.text} size={14} />
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setMensajeCitado(null)}
+                    aria-label="Cancelar mensaje citado"
+                    className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200/70 dark:hover:bg-slate-700/70 transition-colors cursor-pointer flex-shrink-0"
+                  >
+                    <X size={15} />
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800/90 rounded-full px-4 py-2 border border-slate-200/70 dark:border-slate-700/60 shadow-sm">
               <input
                 ref={inputRef}
@@ -1912,16 +2323,22 @@ export const ChatAyudaInteligente = ({
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Escribe tu consulta..."
+                placeholder="Escribe un mensaje para Kai..."
                 className="flex-1 bg-transparent text-sm text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none"
               />
               <button
                 type="button"
-                onClick={() => handleSendMessage('¡Hola! ¿Cómo andamos?')}
-                aria-label="Enviar saludo rápido"
-                className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
+                onClick={() => setIsQuickMenuOpen((prev) => !prev)}
+                title="Mensajes rápidos"
+                aria-label="Mensajes rápidos"
+                aria-expanded={isQuickMenuOpen}
+                className={`p-1.5 rounded-full transition-colors cursor-pointer ${
+                  isQuickMenuOpen
+                    ? 'text-cyan-500 bg-cyan-500/10'
+                    : 'text-slate-400 hover:text-cyan-500 dark:hover:text-cyan-400'
+                }`}
               >
-                <Smile size={20} strokeWidth={1.8} />
+                <Zap size={19} strokeWidth={2} />
               </button>
               <button
                 type="button"
