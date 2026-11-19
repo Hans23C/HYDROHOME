@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import { CalendarRange } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { GraficaPeriodoInteractiva } from '../components/charts/GraficaPeriodoInteractiva';
 import { SelectorPeriodoConsumo } from '../components/consumo/SelectorPeriodoConsumo';
@@ -191,15 +192,33 @@ export const PantallaConsumo = () => {
   }, [selectedPeriod, selectedDate, selectedDayConsumption, sys.address]);
 
   return (
-    <div className="flex-1 flex flex-col bg-white dark:bg-[#0B1726] rounded-t-[36px] min-h-[calc(100dvh-120px)] p-5 sm:p-7 shadow-xl pb-32 text-slate-800 dark:text-slate-100">
+    <div className="flex-1 flex flex-col bg-white dark:bg-[#0B1726] rounded-t-[36px] p-5 sm:p-7 pb-24 shadow-xl text-slate-800 dark:text-slate-100">
       {/* 1. Selector Superior (Día / Semana / Mes) + Calendario Dinámico */}
-      <div className="pb-5 border-b border-slate-100 dark:border-slate-800">
-        <SelectorPeriodoConsumo
-          selectedPeriod={selectedPeriod}
-          onSelectPeriod={handleSelectPeriod}
-          isCalendarOpen={isCalendarOpen}
-          onToggleCalendar={() => setIsCalendarOpen((prev) => !prev)}
-        />
+      <div className="pt-2 pb-5 border-b border-slate-100 dark:border-slate-800">
+        <div className="w-full px-3.5 py-2.5 rounded-xl bg-cyan-500/10 dark:bg-cyan-500/15 border border-cyan-500/30 flex items-center gap-2.5 mb-3.5 shadow-sm">
+          <div className="w-7 h-7 rounded-lg bg-cyan-500/20 flex items-center justify-center shrink-0">
+            <CalendarRange className="w-4 h-4 text-cyan-600 dark:text-cyan-300" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs sm:text-sm font-bold text-slate-800 dark:text-white leading-tight">
+              Periodo de consulta
+            </p>
+            <p className="text-[11px] sm:text-xs font-medium text-cyan-700 dark:text-cyan-300 leading-tight mt-0.5">
+              Elige visualizar por Día, Semana o Mes
+            </p>
+          </div>
+
+
+        </div>
+
+        <div className="mb-5">
+          <SelectorPeriodoConsumo
+            selectedPeriod={selectedPeriod}
+            onSelectPeriod={handleSelectPeriod}
+            isCalendarOpen={isCalendarOpen}
+            onToggleCalendar={() => setIsCalendarOpen((prev) => !prev)}
+          />
+        </div>
 
         {isCalendarOpen && (
           <CalendarioConsumo

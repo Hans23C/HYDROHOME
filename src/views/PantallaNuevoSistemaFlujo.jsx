@@ -69,14 +69,14 @@ export const PantallaNuevoSistemaFlujo = ({ onFinish }) => {
 
   if (step === 'success') {
     return (
-      <div className="flex-1 flex flex-col bg-white dark:bg-[#0B1726] rounded-t-[36px] min-h-[calc(100dvh-120px)] p-4 sm:p-6 shadow-xl pb-28 text-slate-800 dark:text-slate-100">
+      <div className="flex-1 flex flex-col bg-white dark:bg-[#0B1726] rounded-t-[36px] p-4 sm:p-6 shadow-xl pb-24 text-slate-800 dark:text-slate-100">
         <GlowingBlueBox
           isGenerating={true}
           glowColor="good"
           isIntense={true}
           className="flex-1 flex flex-col"
         >
-          <div className="flex-1 flex flex-col justify-between p-6 sm:p-8 min-h-[calc(100dvh-230px)]">
+          <div className="flex-1 flex flex-col justify-between p-6 sm:p-8">
             <div className="flex-1 flex flex-col items-center justify-center text-center max-w-md mx-auto py-4">
               {/* Imagen de Éxito */}
               <div className="w-28 h-28 rounded-full bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/15 p-3">
@@ -126,7 +126,7 @@ export const PantallaNuevoSistemaFlujo = ({ onFinish }) => {
   }
 
   return (
-    <div className="flex-1 flex flex-col justify-between bg-white dark:bg-[#0B1726] rounded-t-[36px] min-h-[calc(100dvh-120px)] p-6 sm:p-8 shadow-xl pb-28 text-slate-800 dark:text-slate-100 relative">
+    <div className="flex-1 flex flex-col justify-between bg-white dark:bg-[#0B1726] rounded-t-[36px] p-6 sm:p-8 shadow-xl pb-24 text-slate-800 dark:text-slate-100 relative">
       <div className="max-w-md w-full mx-auto">
         {/* Pestañas alternables: Personal / Negocio */}
         <div className="flex items-center p-1.5 rounded-2xl bg-slate-100 dark:bg-[#132235] border border-slate-200/70 dark:border-slate-800 mb-7">

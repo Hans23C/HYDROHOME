@@ -15,7 +15,7 @@ export const PantallaMisSistemas = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-white dark:bg-[#0B1726] rounded-t-[36px] min-h-[calc(100dvh-120px)] p-5 sm:p-7 shadow-xl pb-28">
+    <div className="flex-1 flex flex-col bg-white dark:bg-[#0B1726] rounded-t-[36px] p-5 sm:p-7 pb-24 shadow-xl">
       {/* 1. SECCIÓN SISTEMAS Y VIVIENDAS */}
       <div>
         <div className="flex items-center justify-between pb-3">

@@ -50,7 +50,7 @@ export const PantallaNotificaciones = ({ onBack, onNavigateToChat }) => {
   ];
 
   return (
-    <div className="flex-1 flex flex-col bg-white dark:bg-[#0F1722] rounded-t-[36px] min-h-[calc(100dvh-120px)] p-6 sm:p-8 shadow-xl pb-24">
+    <div className="flex-1 flex flex-col bg-white dark:bg-[#0F1722] rounded-t-[36px] p-6 sm:p-8 shadow-xl pb-24">
       {/* Encabezado de la Sección */}
       <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
         <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">

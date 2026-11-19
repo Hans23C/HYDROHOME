@@ -10,6 +10,58 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { AnimacionNivelCisterna } from '../components/animations/AnimacionNivelCisterna';
 import { AnimacionFlujoAgua } from '../components/animations/AnimacionFlujoAgua';
+import { AppleEmoji } from '../components/common/AppleEmoji';
+
+const SALUDOS_MEXICO_SINGULAR = [
+  // Norte (Sinaloa, Sonora, Nuevo León, Chihuahua)
+  { texto: '¡Qué rollo, plebe!', emoji: '🤙' },
+  { texto: '¡Qué onda, compa!', emoji: '🤠' },
+  { texto: '¡Qué tranza, pariente!', emoji: '🔥' },
+  { texto: '¡Quiúbole, primo!', emoji: '😎' },
+  // Centro / CDMX / EdoMéx
+  { texto: '¡Qué onda, carnal!', emoji: '✌️' },
+  { texto: '¡Qué transita por tus venas!', emoji: '⚡' },
+  { texto: '¡Quiúbole, qué tal tu día!', emoji: '☀️' },
+  { texto: '¡Qué milagro, qué gusto verte!', emoji: '🙌' },
+  // Occidente / Bajío (Jalisco, Michoacán, Guanajuato)
+  { texto: '¡Qué onda, mi chavo!', emoji: '😄' },
+  { texto: '¡Qué hubo, paisano!', emoji: '🌵' },
+  { texto: '¡Cómo andas, valedor!', emoji: '💪' },
+  // Sur / Sureste (Yucatán, Veracruz, Oaxaca, Chiapas)
+  { texto: '¡Qué onda, mi hermano!', emoji: '🌊' },
+  { texto: '¡Hola, qué tal va todo!', emoji: '💧' },
+  { texto: '¡Qué onda, amigo!', emoji: '👋' },
+  { texto: '¡Buenas, listo para checar tu agua!', emoji: '🚰' },
+];
+
+const LAST_SALUDO_KEY = 'hydro_last_saludo_idx_v1';
+
+const seleccionarSaludoSingular = () => {
+  let prevIdx = -1;
+  try {
+    const saved = localStorage.getItem(LAST_SALUDO_KEY);
+    if (saved !== null) prevIdx = Number(saved);
+  } catch {
+    prevIdx = -1;
+  }
+
+  let nextIdx = Math.floor(Math.random() * SALUDOS_MEXICO_SINGULAR.length);
+  if (SALUDOS_MEXICO_SINGULAR.length > 1 && nextIdx === prevIdx) {
+    nextIdx =
+      (nextIdx +
+        1 +
+        Math.floor(Math.random() * (SALUDOS_MEXICO_SINGULAR.length - 1))) %
+      SALUDOS_MEXICO_SINGULAR.length;
+  }
+
+  try {
+    localStorage.setItem(LAST_SALUDO_KEY, String(nextIdx));
+  } catch {
+    // Ignorar error de almacenamiento
+  }
+
+  return SALUDOS_MEXICO_SINGULAR[nextIdx];
+};
 
 export const PanelInicio = ({
   onNavigateToSystems,
@@ -31,6 +83,7 @@ export const PanelInicio = ({
   const [pressure, setPressure] = useState(activeSystem?.pressure ?? 3.6);
   const [flowRate, setFlowRate] = useState(activeSystem?.flowRate ?? 14.5);
   const [isSimulatingLeak, setIsSimulatingLeak] = useState(false);
+  const [saludoActual] = useState(() => seleccionarSaludoSingular());
 
   // Sincronización reactiva ante cambios de vivienda o sistema
   useEffect(() => {
@@ -84,13 +137,14 @@ export const PanelInicio = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-white dark:bg-[#07131F] rounded-t-[36px] min-h-[calc(100dvh-100px)] px-5 sm:px-6 pt-6 pb-28 shadow-xl transition-colors space-y-6 sm:space-y-7 no-scrollbar">
+    <div className="flex-1 flex flex-col bg-white dark:bg-[#07131F] rounded-t-[36px] px-5 sm:px-6 pt-6 pb-24 shadow-xl transition-colors space-y-6 sm:space-y-7 no-scrollbar">
       {/* ============================================================== */}
       {/* 1. SECCIÓN DE BIENVENIDA                                       */}
       {/* ============================================================== */}
       <div className="pt-1">
-        <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-          Que rollo plebes <span className="animate-bounce inline-block">👋</span>
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2.5 flex-wrap">
+          <span>{saludoActual.texto}</span>
+          <AppleEmoji emoji={saludoActual.emoji} size={30} className="shrink-0" />
         </h2>
         <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 mt-1.5 font-medium leading-snug break-words">
           Monitoreo predictivo y control de agua en tiempo real

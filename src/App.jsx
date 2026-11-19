@@ -341,8 +341,8 @@ const AppContent = () => {
 
           {/* Único Contenedor con Scroll Vertical (o contenedor fijo para Chat) */}
           <main
-            className={`flex-1 min-h-0 w-full overflow-x-hidden bg-white dark:bg-[#0B1726] rounded-t-[28px] -mt-6 relative z-20 no-scrollbar ${
-              subView === 'chat' ? 'overflow-hidden flex flex-col pb-0' : 'overflow-y-auto pb-24'
+            className={`flex-1 min-h-0 w-full overflow-x-hidden overscroll-y-none bg-white dark:bg-[#0B1726] rounded-t-[28px] -mt-6 relative z-20 no-scrollbar ${
+              subView === 'chat' ? 'overflow-hidden flex flex-col pb-0' : 'overflow-y-auto pb-0'
             }`}
           >
             <AnimatePresence mode="wait">
@@ -364,7 +364,7 @@ const AppContent = () => {
           </main>
 
           {/* Botón Flotante (FAB) Rive de Soporte IA en Inicio (Etapa 1: 'home') */}
-          {botStage === 'home' && activeTab === 0 && !isSubViewActive && (
+          {activeTab === 0 && !isSubViewActive && botStage === 'home' && (
             <BotonFlotanteSoporteIA
               activeTab={activeTab}
               subView={subView}

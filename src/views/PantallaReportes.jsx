@@ -93,7 +93,7 @@ export const PantallaReportes = () => {
   });
 
   return (
-    <div className="flex-1 flex flex-col bg-white dark:bg-[#0B1726] rounded-t-[36px] min-h-[calc(100dvh-120px)] p-5 sm:p-6 pb-28 text-slate-800 dark:text-slate-100 space-y-5">
+    <div className="flex-1 flex flex-col bg-white dark:bg-[#0B1726] rounded-t-[36px] p-5 sm:p-6 pb-24 text-slate-800 dark:text-slate-100 space-y-5">
       {/* ============================================================== */}
       {/* 1. CABECERA DEL APARTADO DE AVERÍAS EN TUBERÍAS                */}
       {/* ============================================================== */}

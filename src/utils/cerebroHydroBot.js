@@ -333,6 +333,513 @@ const BANCO_FALLBACK_HUMANO = [
 ];
 
 // ============================================================================
+// ============================================================================
+// MÓDULO DE SOPORTE Y GUÍA FUNCIONAL REAL DE HYDROINTELLIGENT (AUDITADO)
+// ============================================================================
+
+const BANCO_GUIAS_APP = {
+  modo_oscuro: [
+    '¡Está súper fácil cambiar entre Modo Claro y Modo Oscuro! Sirve para ajustar toda la apariencia visual de la app según la luz del momento.\n\nDónde está:\n1. Toca la pestaña "Perfil" (ícono de usuario abajo a la derecha) o tu avatar arriba a la izquierda.\n2. Baja a la sección "Notifications".\n3. Toca el interruptor naranja que dice "Modo Oscuro" (tiene un ícono de luna/sol) y cambia al instante.\n\n¿Quieres que te guíe con alguna otra opción del perfil?',
+    'Para alternar entre Modo Claro y Modo Oscuro, solo ve a tu Perfil:\n1. Abre "Perfil" en la barra inferior derecha.\n2. En el bloque "Notifications", busca la fila "Modo Oscuro — Apariencia visual de la app".\n3. Pícale al switch de la derecha y listo, toda la interfaz y las partículas se adaptan solitas.\n\n¿Te ayudo a ubicar otra configuración?',
+  ],
+  cambiar_vivienda: [
+    'Puedes alternar al instante entre tus viviendas registradas (como "Casa Principal" y "Casa de Campo / Vacacional") para ver la telemetría de cada una.\n\nTienes 2 caminos rápidos:\n• Desde Inicio: toca la tarjeta superior izquierda "Cambiar Sistema" (la que muestra el % de cisterna).\n• Desde la barra inferior: toca "Sistemas" (ícono de cubo) y en la tarjeta de la casa que quieras ver pulsa "Seleccionar Vivienda".\n\n¿Quieres que te explique también cómo enlazar una casa nueva?',
+    '¡De volada! Si quieres cambiar de vivienda activa:\n1. En "Inicio", pícale a la tarjeta "Cambiar Sistema" (o ve directo al ícono "Sistemas" en la barra inferior).\n2. Ahí verás tus viviendas con su % de cisterna, presión y código ESP32.\n3. Toca "Seleccionar Vivienda" en la que quieras monitorear y te regresa a Inicio ya actualizada.\n\n¿Ocupas desvincular o agregar otra vivienda?',
+  ],
+  agregar_sensor: [
+    'Para vincular un nuevo módulo ESP32 y monitorear otra vivienda o negocio:\n1. Toca "Sistemas" (ícono de cubo en la barra inferior).\n2. Baja a "Gestión de Dispositivos IoT" y pulsa "+ Enlazar Nueva Vivienda".\n3. En la ventana "Nuevo Sistema", toca "Agregar".\n4. Elige "Personal" o "Negocio", escribe el nombre, dirección, selecciona la capacidad (de 1,100 L a 20,000 L) y captura el "Código ESP32" (ej. ESP32-HYDRO-XXXX).\n5. Marca "Guardar información del sistema" y pulsa "Agregar".\n\n¿Ya tienes a la mano el código de tu ESP32 o tienes duda en algún paso?',
+    'Agregar otro sensor ESP32 es bien rápido:\n1. Entra a la pestaña "Sistemas" abajo.\n2. En la tarjeta azul "Enlazar Nueva Vivienda", toca el botón blanco "+ Enlazar Nueva Vivienda" y luego "Agregar".\n3. Llena los datos de la vivienda/negocio, la capacidad de cisterna y tu Código ESP32, y dale en "Agregar".\n\n¿Quieres saber cómo cambiar entre sistemas después de agregarlo?',
+  ],
+  bomba: [
+    'Desde la pantalla principal puedes controlar la bomba presurizadora y vigilar presión y flujo:\n1. Ve a la pestaña "Inicio" (ícono de casita abajo a la izquierda).\n2. Arriba a la derecha verás la tarjeta "Apagar Bomba" / "Encender Bomba", que muestra la presión actual (ej. "3.6 bar · Activa" o "0.0 bar · Reposo").\n3. Tócala una vez para alternar su estado; te saldrá un aviso confirmando el cambio y abajo en la gráfica de flujo verás el movimiento en L/min.\n\n¿Quieres que revisemos ahorita cómo está tu bomba en tiempo real?',
+    'Para encender o apagar la bomba manualmente:\n1. Entra a "Inicio" en la barra inferior.\n2. Toca la segunda tarjeta superior ("Encender Bomba" o "Apagar Bomba").\n3. El sistema actualiza la presión (bar) y la animación de flujo de agua al momento.\n\n¿Te gustaría checar el estado actual de tu bomba o presión?',
+  ],
+  consumo_periodo: [
+    'El Historial de Consumo te deja analizar tu gasto por día exacto, semana completa o mes entero:\n1. Toca "Consumo" (ícono de hoja abajo en la barra).\n2. Justo debajo del banner "Periodo de consulta", elige "DÍA", "SEMANA" o "MES" (si tocas la pestaña que ya está activa, puedes ocultar o abrir el calendario).\n3. Toca cualquier fecha del calendario (o muévete con las flechas < y >) y la tarjeta inferior ("GRÁFICA POR DÍA / SEMANA / MES") se actualizará con tus litros o m³.\n\n¿Tienes duda sobre qué significan los puntitos de colores del calendario?',
+    'Para ver tu consumo por Día, Semana o Mes:\n1. Abre la pestaña "Consumo" en la barra inferior.\n2. Selecciona "DÍA", "SEMANA" o "MES" en la barra superior.\n3. Selecciona una fecha en el calendario y abajo verás la gráfica interactiva con el consumo calculado en litros o m³.\n\n¿Quieres que te explique qué indica cada color en el calendario?',
+  ],
+  colores_calendario: [
+    'Los puntitos debajo de cada día del calendario en "Consumo" indican cómo estuvo tu gasto ese día:\n• Verde: Consumo Normal (dentro de lo saludable).\n• Amarillo: Sobrepasado (gasto por arriba de tu rango habitual).\n• Rojo: Excesivo / Alerta (consumo muy alto, conviene revisar fugas).\n\nAdemás, el brillo de la tarjeta de gráfica de abajo cambia al color del día seleccionado (o al color predominante si estás viendo SEMANA o MES).\n\n¿Quieres que revisemos también cómo exportar tu historial a Excel?',
+    'En el calendario de "Historial de Consumo", cada punto de color significa:\n• 🟢 Verde = Normal\n• 🟡 Amarillo = Sobrepasado\n• 🔴 Rojo = Excesivo / Alerta\n\nCuando eliges SEMANA o MES, el borde luminoso de la gráfica toma el estado que más se repitió en ese periodo.\n\n¿Te ayudo con algo más de la vista de Consumo?',
+  ],
+  incidencias: [
+    'La Bitácora de Incidencias ("Averías en Tuberías") sirve para registrar daños físicos y darles seguimiento:\n1. Ve a "Inicio" y en "Módulos de Gestión" toca "Incidencias" (ícono amarillo de alerta).\n2. Pulsa el botón azul "+ Reportar" arriba a la derecha.\n3. Elige el "Tipo de Avería" (fisura en PVC, válvula check, desacople, etc.), la vivienda, escribe la "Descripción Técnica", selecciona prioridad ("Alta" o "Media") y toca "Registrar Incidencia".\n4. Puedes filtrar tus folios arriba con "Todos", "Activos" o "Reparados" y por vivienda.\n\n¿Quieres reportar una avería ahorita o tienes otra duda?',
+    'Para reportar una tubería rota o ver reparaciones:\n1. En "Inicio", toca el módulo circular "Incidencias".\n2. Usa los botones "Todos / Activos / Reparados" o los chips de vivienda para consultar reportes existentes.\n3. Para crear uno nuevo, toca "+ Reportar", llena los datos técnicos y pulsa "Registrar Incidencia"; se genera tu folio automático.\n\n¿Te guío también con la prueba rápida de fugas?',
+  ],
+  fugas_prueba: [
+    'En HydroIntelligent puedes correr una prueba acústica rápida de microfugas directo desde Inicio:\n1. Entra a la pestaña "Inicio" (casita abajo).\n2. En "Módulos de Gestión", toca el círculo azul "Fugas" (ícono de escudo).\n3. Verás que cambia brevemente a "Probando..." mientras analiza variaciones de presión y estanqueidad, y al terminar te muestra una notificación confirmando si el sistema está hermético.\n\nY si quieres que yo cheque ahorita la telemetría de fugas de tu casa, ¡nomás pídeme "diagnóstico de fugas"!',
+    'Para hacer una prueba de fugas en la app:\n1. En "Inicio", ubica la sección "Módulos de Gestión".\n2. Toca el botón "Fugas" (el del escudo azul).\n3. Espera ~2 segundos mientras evalúa la presión de la red y revisa el aviso de resultado en pantalla.\n\n¿Quieres que revisemos tu estado actual de fugas aquí en el chat?',
+  ],
+  pipa: [
+    'El módulo de Pipa te lleva a "Servicios de Agua Potable" para pedir suministro o contactar atención:\n1. En "Inicio", dentro de "Módulos de Gestión", toca el botón morado "Pipa" (ícono de camión) —también puedes entrar desde "Perfil → More → Contact Us".\n2. Ahí tienes 4 canales: "Call Center" (líneas 24/7 para desabasto y emergencias como 800-493-7646), "Email" (copia soporte@hydrohome.io), "FAQ" (abre incidencias) y "Support Chat" (para volver conmigo).\n\nDato útil: en tu casa actual te faltan unos {LITROS_FALTANTES} L para llenar al 100%, por si ocupas darle la medida al piper@.\n\n¿Quieres ver el nivel exacto de tu cisterna ahora?',
+    'Para pedir una pipa o contactar servicios:\n1. Ve a "Inicio" → "Módulos de Gestión" → toca "Pipa".\n2. En "Servicios de Agua Potable" toca "Call Center" para marcar directo a las líneas 24/7, o usa "Email" para copiar el correo de soporte.\n\nComo referencia rápida, hoy te caben {LITROS_FALTANTES} L en tu cisterna.\n\n¿Te muestro el resumen visual de tu cisterna?',
+  ],
+  exportar_excel: [
+    '¡Fíjate que la exportación a Excel (.xlsx) está directo en tu Perfil!\n1. Toca "Perfil" en la barra inferior derecha (o tu avatar arriba a la izquierda).\n2. En la sección "General", busca la opción "Descargar Bitácora (.xlsx)" (ícono de hoja de cálculo).\n3. Tócala y la app generará y descargará automáticamente tu archivo Excel con lecturas y telemetría.\n\n¿Quieres que te guíe con otra herramienta de tu Perfil?',
+    'Para bajar tus datos en Excel (.xlsx):\n1. Entra a "Perfil" abajo a la derecha.\n2. En el bloque "General", toca "Descargar Bitácora (.xlsx)".\n3. Se descarga de volada el archivo con tus registros listos para abrir en Excel.\n\n¿Te ayudo a revisar alguna otra sección?',
+  ],
+  perfil_cuenta: [
+    'Desde "Perfil" (ícono de usuario abajo a la derecha o tu avatar arriba a la izquierda) gestionas toda tu cuenta:\n• "Edit": cambia nombre, correo, teléfono, dirección, estado, foto y contraseña.\n• "Avatar 3D & DiceBear": personaliza tu ícono animado.\n• "Payment Methods" y "Locations": consulta tu método de pago y administra viviendas.\n• "Push Notifications": activa o desactiva alertas sonoras.\n• "Modo Oscuro": cambia entre tema claro y oscuro.\n• "Logout": cierra sesión de forma segura.\n\n¿Qué ajuste específico del perfil quieres hacer?',
+    'En la pestaña "Perfil" tienes todo a la mano:\n1. Toca "Edit" arriba para editar tus datos personales o cambiar contraseña.\n2. En "General" puedes personalizar tu avatar, descargar la bitácora .xlsx o ir a tus viviendas.\n3. En "Notifications" controlas "Push Notifications" y "Modo Oscuro", y en "More" encuentras "Contact Us" y "Logout".\n\n¿Te explico algún ajuste de ahí más a detalle?',
+  ],
+  notificaciones: [
+    'Para ver tus alertas y avisos recientes:\n1. Toca el ícono de la campana arriba a la derecha en la barra azul superior (si ves un puntito rojo, tienes avisos nuevos).\n2. Ahí verás recordatorios de nivel de cisterna, calibración de bomba, citas e incidencias.\n3. Si pasas el dedo o cursor sobre un aviso dinámico, aparece el ícono de bote de basura para eliminarlo.\n\n¿Buscabas activar también las alertas push en Perfil?',
+    'Tus notificaciones están siempre en la campana de la esquina superior derecha.\nSolo tócala para abrir "Today" y revisar tus avisos de telemetría, mantenimiento o incidencias.\n\n¿Quieres saber cómo activar o silenciar las "Push Notifications"?',
+  ],
+  chat_kai: [
+    '¡Qué buena pregunta! Aquí conmigo puedes usar varios gestos tipo WhatsApp:\n• Mantén presionada cualquier burbuja (o haz clic derecho en PC) para reaccionar con emojis 👍 ❤️ 😂 😮 😢 🙏.\n• Desliza una burbuja hacia la derecha (o toca "Responder" en el menú flotante) para citar ese mensaje y preguntarme justo sobre eso.\n• Toca el botón del rayo ⚡ junto al campo de texto para abrir "Consultas rápidas para Kai".\n• Si ya terminaste, toca mi avatar circular arriba a la izquierda para despedirnos y volver a Inicio.\n\n¿Te late probar alguna consulta rápida ahorita?',
+    'Te cuento cómo sacarle todo el jugo a este chat:\n1. Mantén presionado un mensaje (o clic derecho) para ponerle reacción emoji.\n2. Desliza cualquier burbuja a la derecha para citarla y responder directo a ese punto.\n3. Pícale al ícono ⚡ abajo a la derecha para mandar consultas rápidas de cisterna, bomba, fugas, consumo, tips o chistes.\n4. Toca mi avatar arriba a la izquierda cuando quieras salir.\n\n¿En qué te echo la mano ahora?',
+  ],
+  general_app: [
+    '¡Con gusto te doy el tour rápido por HydroIntelligent! En la barra de abajo tienes 4 pestañas principales:\n1. Inicio (casita): cambias de sistema, enciendes/apagas la bomba, corres prueba de Fugas, entras a Incidencias o pides Pipa, y ves tus gráficas en vivo.\n2. Consumo (hoja): consultas tu historial por DÍA, SEMANA o MES en el calendario de colores.\n3. Sistemas (cubo): alternas entre viviendas y enlazas nuevos sensores ESP32.\n4. Perfil (usuario): cambias a Modo Oscuro, descargas tu Excel (.xlsx), editas cuenta/avatar y configuras alertas.\n\nY arriba a la derecha tienes la campana de Notificaciones. ¿De cuál apartado quieres que te explique los pasos exactos?',
+    'Aquí tienes el mapa completo de la app:\n• Inicio: bomba, nivel en vivo, pruebas de fugas, incidencias y pipa.\n• Consumo: calendario interactivo por Día, Semana o Mes.\n• Sistemas: cambio de vivienda y enlace de nuevos ESP32.\n• Perfil: Modo Oscuro, descarga de bitácora .xlsx, edición de perfil y cierre de sesión.\n\nDime qué quieres hacer primero y te paso los pasos exactos.',
+  ],
+  simulador_cisterna_flujo: [
+    '¡Buen ojo! Las dos tarjetas animadas de "Inicio" tienen controles interactivos para probar el sistema al instante:\n• En la tarjeta de Cisterna: abajo verás "Simular nivel:" con los botones "Llenar" (+15%), "Vaciar" (-15%) y "68%" (restablece). Sirven para probar cómo cambian las olas y los colores de estado sin esperar a que cambie el tanque real.\n• En "Flujo de Tubería Principal": el botón "Pausar / Reanudar" detiene o activa la animación del flujo entre 14.5 L/min y 0.0 L/min.\n\n¿Quieres que te explique también qué significa cada color del semáforo de cisterna?',
+    'Esos botones de "Llenar", "Vaciar", "68%" y "Pausar / Reanudar" en "Inicio" son un simulador visual en tiempo real:\n1. Toca "Llenar" o "Vaciar" en la cisterna para ver cómo reacciona el porcentaje, los litros disponibles y el chorro automático cuando baja del 25%.\n2. Toca "Pausar" en la tubería para simular flujo en cero (0.0 L/min) o "Reanudar" para verlo circular.\n\n¿Te gustaría checar el nivel real de tu sistema ahora?',
+  ],
+  semaforo_cisterna: [
+    'La tarjeta de Cisterna en "Inicio" evalúa automáticamente tu porcentaje de agua en 4 niveles:\n• 🟢 Nivel Óptimo (70% o más): buena reserva para varios días.\n• 🔵 Nivel Normal (40% a 69%): reserva estable para uso cotidiano.\n• 🟡 Nivel Medio (20% a 39%): conviene moderar el consumo o planear recarga.\n• 🔴 Nivel Crítico (menos de 20%): reserva muy baja; además al bajar de 25% se activa el chorro visual de recarga.\n\n¿Quieres que calcule cuántos días de autonomía te quedan ahorita?',
+    'Tu nivel de cisterna cambia de color según la reserva:\n• Verde (≥ 70%): Nivel Óptimo.\n• Azul (40%–69%): Nivel Normal.\n• Ámbar (20%–39%): Nivel Medio.\n• Rojo (< 20%): Nivel Crítico.\n\n¿Te muestro tu widget de cisterna en vivo?',
+  ],
+  grafica_costos_mxn: [
+    'En "Consumo", debajo del calendario, la tarjeta de la gráfica no solo muestra litros o m³: también calcula todo esto automáticamente:\n• Costo estimado en pesos MXN (arriba a la derecha en verde) según el día, semana o mes elegido.\n• Estadísticas clave: Promedio, Pico Máx. (en ámbar) y Mínimo (en verde).\n• Gráfica interactiva: si tocas o pasas el cursor sobre los puntos de la línea curva, aparece un globo con el dato exacto (el punto amarillo marca el pico máximo).\n\n¿Quieres saber cómo cambiar entre Día, Semana y Mes?',
+    '¡Sí puedes ver el estimado en dinero y picos de gasto!\n1. Entra a "Consumo" en la barra inferior y elige DÍA, SEMANA o MES.\n2. En la tarjeta de la gráfica verás arriba a la derecha el costo estimado en MXN, y debajo el Promedio, Pico Máx. y Mínimo.\n3. Toca cualquier punto de la curva para ver su lectura exacta.\n\n¿Te explico qué significan los puntitos de colores del calendario?',
+  ],
+  avatar_personalizado: [
+    '¡Puedes ponerle tu propio estilo a tu avatar! Así es como funciona:\n1. Ve a "Perfil" (abajo a la derecha) y en "General" toca "Avatar 3D & DiceBear" (o entra a "Edit" y toca el ícono de cámara en tu foto).\n2. Elige una de las colecciones disponibles (incluye estilos animados como Pixelbot e Initial-Face).\n3. Escoge un modelo, toca "Aleatorio" o escribe tu apodo/clave en "Semilla personalizada" y pulsa "Generar".\n4. Dale en "Guardar Avatar" y se actualiza en toda la app al instante.\n\n¿Quieres personalizar también tus datos o contraseña en Edit?',
+    'Para cambiar tu avatar por un robot animado o diseño único:\n1. Abre "Perfil → General → Avatar 3D & DiceBear".\n2. Selecciona colección, prueba modelos o escribe cualquier palabra en "semilla personalizada" + "Generar".\n3. Pulsa "Guardar Avatar" para aplicarlo.\n\n¿Te ayudo con otro ajuste de tu Perfil?',
+  ],
+  cambiar_contrasena: [
+    'Para cambiar tu contraseña de acceso:\n1. Entra a "Perfil" (barra inferior derecha) y toca el botón naranja "Edit" debajo de tu nombre.\n2. Ahí accede a "Change Password" (asegúrate de estar en la pestaña "Password" arriba).\n3. Escribe tu contraseña actual ("Current Password"), la nueva ("New Password") y confírmala en "Confirm Password" (puedes tocar el ojito para verificarla).\n4. Guarda los cambios; toma en cuenta que la app te pedirá iniciar sesión de nuevo por seguridad.\n\n¿Necesitas ayuda con algún otro dato de tu cuenta?',
+    'Cambiar tu contraseña se hace desde "Perfil → Edit":\n1. Ve a la pantalla de cambio de contraseña ("Change Password").\n2. Ingresa contraseña actual, nueva contraseña y confirmación.\n3. Al guardar, recibirás confirmación para volver a entrar con tu nueva clave.\n\n¿Te ayudo a ubicar otra opción de seguridad o cierre de sesión?',
+  ],
+  cerrar_sesion_seguridad: [
+    'Si cierras sesión en tu teléfono, ¡no te preocupes por tus sensores!\nAl tocar "Perfil → More → Logout" se abre una confirmación que te recuerda que la telemetría y protección anti-fugas siguen activas 24/7 en tus viviendas; solo se cierra tu sesión en ese dispositivo.\n\n¿Quieres saber cómo cambiar de cuenta o volver a entrar después?',
+    'Para cerrar sesión de forma segura:\n1. Entra a "Perfil" abajo a la derecha.\n2. Baja hasta la sección "More" y toca "Logout" (al final en rojo).\n3. Confirma en el botón "Cerrar Sesión". Tus sensores y monitoreo siguen trabajando sin interrupción.\n\n¿Tienes otra duda sobre tu cuenta?',
+  ],
+  desvincular_vivienda: [
+    'Para desvincular o quitar una vivienda que ya no monitoreas:\n1. Toca "Sistemas" (ícono de cubo abajo).\n2. Ubica la tarjeta de la vivienda que quieres quitar —ojo: no debe ser la vivienda activa en ese momento (si lo es, selecciona primero otra).\n3. Toca el ícono del bote de basura a la izquierda del botón "Seleccionar Vivienda".\n\nNota importante: la app siempre exige mantener al menos 1 sistema conectado, así que no te dejará borrar la única vivienda que tengas.\n\n¿Quieres que te explique cómo agregar otra antes de borrar esa?',
+    'Puedes desvincular viviendas secundarias desde "Sistemas":\n1. Asegúrate de tener más de 1 vivienda y que la que vas a quitar no sea la "Vivienda Activa".\n2. Toca el botón de papelera junto a "Seleccionar Vivienda".\n\nSi solo tienes un sistema, primero enlaza el nuevo y luego quitas el anterior. ¿Te paso los pasos para enlazar el nuevo?',
+  ],
+  soporte_contacto: [
+    'Si necesitas hablar con soporte humano o emergencias de agua, tienes acceso directo en "Servicios de Agua Potable":\n• ¿Cómo llegar? En "Inicio → Módulos de Gestión → Pipa", o en "Perfil → More → Contact Us".\n• "Call Center": abre la Central de Asistencia Hídrica 24/7 con líneas para Fugas/Desabasto (800-493-7646), Soporte ESP32 (55-8421-9900) y Atención al Cliente (800-012-3456).\n• "Email": copia soporte@hydrohome.io al portapapeles en un toque.\n• "FAQ": te lleva a la bitácora de incidencias.\n\n¿Quieres que te diga también dónde consultar tu método de pago?',
+    'Puedes contactar a soporte técnico o emergencias desde "Perfil → More → Contact Us" (o "Inicio → Pipa"):\n1. Toca "Call Center" para ver los teléfonos 24/7 (emergencias de fugas, soporte ESP32 y atención).\n2. Toca "Email" para copiar soporte@hydrohome.io.\n3. O toca "Support Chat" para volver directo conmigo.\n\n¿En qué más te puedo orientar?',
+  ],
+  vista_escritorio: [
+    'Si estás usando HydroIntelligent desde computadora/navegador, verás arriba del teléfono simulado la barra "Shifty Hydro 2.0":\nToca el botón "Pantalla Completa" / "Modo Simulador" en esa barra superior para alternar entre la vista tipo móvil centrada y la vista expandida.\n\n¿Buscabas cambiar también entre Modo Claro y Modo Oscuro?',
+    'En escritorio tienes un botón arriba a la derecha del marco ("Pantalla Completa" / "Modo Simulador") para cambiar cómo se adapta la app en tu monitor.\nY si lo que quieres es cambiar los colores claros u oscuros, eso está en "Perfil → Modo Oscuro".\n\n¿Algo más que quieras ajustar?',
+  ],
+};
+
+const esIntencionGuiaApp = (lower) =>
+  /(\bcomo (funciona|uso|usar|hago|cambio|cambiar|agrego|agregar|anado|anadir|vinculo|vincular|enlazo|enlazar|desvinculo|desvincular|elimino|eliminar|borro|borrar|veo|ver|consulto|consultar|reporto|reportar|pido|pedir|solicito|solicitar|descargo|descargar|exporto|exportar|bajo|bajar|edito|editar|actualizo|actualizar|cierro|cerrar|activo|activar|desactivo|desactivar|enciendo|encender|apago|apagar|pruebo|probar|simulo|simular|pauso|pausar|genero|generar|personalizo|personalizar|pongo|poner|contacto|contactar|hago una prueba|se usa|se cambia|se ve|se reporta|se pide|se agrega|se descarga|se exporta|se edita|se elimina|se borra|se simula|se pone)\b|\bdonde (esta|encuentro|veo|puedo|queda|se cambia|se descarga|se exporta|se reporta|se pide|hay|configuro|cambio|edito|elimino)\b|\bpara que sirve\b|\bpasos para\b|\bayudame a (usar|cambiar|agregar|vincular|reportar|pedir|exportar|descargar|ver|configurar|editar|simular|poner)\b|\bque pasa si\b|\bse puede\b|\bpuedo (cambiar|agregar|eliminar|desvincular|pausar|simular|exportar|descargar|editar|ver el costo|cerrar sesion|poner)\b|\bque significan?\b|\btutorial\b|\bguia\b|\bmenu rapido\b|\bconsultas rapidas\b)/.test(
+    lower
+  );
+
+const resolverGuiaApp = (lower, contextoActual, datos) => {
+  const faltanteLitros = Math.max(0, datos.capacityLiters - datos.litersAvailable).toLocaleString();
+  const interpolar = (texto) => texto.replace(/\{LITROS_FALTANTES\}/g, faltanteLitros);
+
+  if (
+    contieneAlguna(lower, [
+      'modo oscuro',
+      'modo claro',
+      'tema oscuro',
+      'tema claro',
+      'cambiar el tema',
+      'cambiar tema',
+      'apariencia visual',
+    ])
+  ) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.modo_oscuro, contextoActual).texto),
+      tema: 'guia_modo_oscuro',
+    };
+  }
+
+  if (
+    contieneAlguna(lower, [
+      'semaforo',
+      'nivel optimo',
+      'nivel critico',
+      'nivel medio',
+      'colores de la cisterna',
+    ])
+  ) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.semaforo_cisterna, contextoActual).texto),
+      tema: 'guia_semaforo_cisterna',
+    };
+  }
+
+  if (
+    contieneAlguna(lower, [
+      'colores del calendario',
+      'puntos del calendario',
+      'puntitos del calendario',
+      'significan los colores',
+      'normal sobrepasado excesivo',
+      'verde amarillo rojo',
+    ])
+  ) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.colores_calendario, contextoActual).texto),
+      tema: 'guia_colores_calendario',
+    };
+  }
+
+  if (
+    contieneAlguna(lower, [
+      'como funciona este chat',
+      'como funciona el chat',
+      'reacciones del chat',
+      'deslizar para responder',
+      'citar mensaje',
+      'consultas rapidas',
+      'boton del rayo',
+      'como salgo del chat',
+    ])
+  ) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.chat_kai, contextoActual).texto),
+      tema: 'guia_chat_kai',
+    };
+  }
+
+  if (
+    contieneAlguna(lower, [
+      'dicebear',
+      'semilla',
+      'avatar 3d',
+      'pixelbot',
+      'personalizar avatar',
+      'avatar personalizado',
+      'cambiar avatar',
+    ])
+  ) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.avatar_personalizado, contextoActual).texto),
+      tema: 'guia_avatar_personalizado',
+    };
+  }
+
+  if (
+    contieneAlguna(lower, [
+      'simular nivel',
+      'llenar y vaciar',
+      'boton llenar',
+      'boton vaciar',
+      'pausar flujo',
+      'reanudar flujo',
+      'flujo de tuberia principal',
+      'simulador de nivel',
+    ])
+  ) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.simulador_cisterna_flujo, contextoActual).texto),
+      tema: 'guia_simulador_cisterna_flujo',
+    };
+  }
+
+  if (
+    contieneAlguna(lower, [
+      'costo estimado',
+      'en pesos',
+      'mxn',
+      'cuanto voy a pagar',
+      'pico maximo',
+      'tooltip de la grafica',
+      'dinero',
+    ])
+  ) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.grafica_costos_mxn, contextoActual).texto),
+      tema: 'guia_grafica_costos_mxn',
+    };
+  }
+
+  if (
+    contieneAlguna(lower, [
+      'modo simulador',
+      'pantalla completa',
+      'shifty hydro',
+    ])
+  ) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.vista_escritorio, contextoActual).texto),
+      tema: 'guia_vista_escritorio',
+    };
+  }
+
+  if (
+    contieneAlguna(lower, [
+      'cambiar contrasena',
+      'cambiar mi contrasena',
+      'nueva contrasena',
+      'change password',
+    ])
+  ) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.cambiar_contrasena, contextoActual).texto),
+      tema: 'guia_cambiar_contrasena',
+    };
+  }
+
+  if (
+    contieneAlguna(lower, [
+      'cerrar sesion',
+      'cierro sesion',
+      'si salgo de mi cuenta',
+      'logout',
+    ])
+  ) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.cerrar_sesion_seguridad, contextoActual).texto),
+      tema: 'guia_cerrar_sesion',
+    };
+  }
+
+  if (
+    contieneAlguna(lower, [
+      'desvincular',
+      'eliminar vivienda',
+      'borrar vivienda',
+      'quitar vivienda',
+      'ultima vivienda',
+      'unica vivienda',
+    ])
+  ) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.desvincular_vivienda, contextoActual).texto),
+      tema: 'guia_desvincular_vivienda',
+    };
+  }
+
+  if (
+    contieneAlguna(lower, [
+      'call center',
+      'soporte@hydrohome',
+      'telefono de soporte',
+      'correo de soporte',
+      'numero de emergencia',
+      'contact us',
+    ])
+  ) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.soporte_contacto, contextoActual).texto),
+      tema: 'guia_soporte_contacto',
+    };
+  }
+
+  if (
+    contieneAlguna(lower, [
+      'editar perfil',
+      'editar mi perfil',
+      'push notifications',
+      'notificaciones push',
+      'metodos de pago',
+      'payment methods',
+    ])
+  ) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.perfil_cuenta, contextoActual).texto),
+      tema: 'guia_perfil_cuenta',
+    };
+  }
+
+  if (!esIntencionGuiaApp(lower)) {
+    return null;
+  }
+
+  if (
+    contieneAlguna(lower, [
+      'esp32',
+      'otro sensor',
+      'nuevo sensor',
+      'nueva vivienda',
+      'nuevo sistema',
+      'enlazar',
+      'vincular',
+      'agregar casa',
+      'agregar sistema',
+      'agregar sensor',
+      'agrego',
+    ])
+  ) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.agregar_sensor, contextoActual).texto),
+      tema: 'guia_agregar_sensor',
+    };
+  }
+
+  if (
+    contieneAlguna(lower, [
+      'cambiar de casa',
+      'cambio de casa',
+      'cambiar de vivienda',
+      'cambio de vivienda',
+      'cambiar sistema',
+      'cambio de sistema',
+      'cambiar de sistema',
+      'otra casa',
+      'otra vivienda',
+      'vivienda',
+      'casa de campo',
+      'casa principal',
+    ])
+  ) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.cambiar_vivienda, contextoActual).texto),
+      tema: 'guia_cambiar_vivienda',
+    };
+  }
+
+  if (
+    contieneAlguna(lower, [
+      'excel',
+      'xlsx',
+      'exportar',
+      'exporto',
+      'exporta',
+      'descargar',
+      'descargo',
+      'mis datos',
+      'bajar reporte',
+      'bajo mis datos',
+    ])
+  ) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.exportar_excel, contextoActual).texto),
+      tema: 'guia_exportar_excel',
+    };
+  }
+
+  if (
+    contieneAlguna(lower, [
+      'tuberia rota',
+      'reportar',
+      'incidencia',
+      'incidencias',
+      'averia',
+      'bitacora',
+      'todos activos reparados',
+    ])
+  ) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.incidencias, contextoActual).texto),
+      tema: 'guia_incidencias',
+    };
+  }
+
+  if (contieneAlguna(lower, ['prueba de fugas', 'probar fugas', 'modulo de fugas', 'fugas', 'fuga'])) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.fugas_prueba, contextoActual).texto),
+      tema: 'guia_fugas_prueba',
+    };
+  }
+
+  if (contieneAlguna(lower, ['pipa', 'call center', 'servicios de agua', 'contact us'])) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.pipa, contextoActual).texto),
+      tema: 'guia_pipa',
+    };
+  }
+
+  if (
+    contieneAlguna(lower, [
+      'semana o mes',
+      'dia semana',
+      'calendario',
+      'historial de consumo',
+      'consumo',
+      'periodo de consulta',
+    ])
+  ) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.consumo_periodo, contextoActual).texto),
+      tema: 'guia_consumo_periodo',
+    };
+  }
+
+  if (contieneAlguna(lower, ['bomba', 'presion', 'flujo'])) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.bomba, contextoActual).texto),
+      tema: 'guia_bomba',
+    };
+  }
+
+  if (contieneAlguna(lower, ['notificacion', 'notificaciones', 'campana', 'avisos'])) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.notificaciones, contextoActual).texto),
+      tema: 'guia_notificaciones',
+    };
+  }
+
+  if (contieneAlguna(lower, ['llenar', 'vaciar', '68%', 'pausar', 'reanudar', 'simular', 'simulador'])) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.simulador_cisterna_flujo, contextoActual).texto),
+      tema: 'guia_simulador_cisterna_flujo',
+    };
+  }
+
+  if (contieneAlguna(lower, ['avatar', 'dicebear', 'semilla'])) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.avatar_personalizado, contextoActual).texto),
+      tema: 'guia_avatar_personalizado',
+    };
+  }
+
+  if (contieneAlguna(lower, ['contrasena', 'password'])) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.cambiar_contrasena, contextoActual).texto),
+      tema: 'guia_cambiar_contrasena',
+    };
+  }
+
+  if (contieneAlguna(lower, ['costo', 'pagar', 'dinero', 'promedio', 'pico'])) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.grafica_costos_mxn, contextoActual).texto),
+      tema: 'guia_grafica_costos_mxn',
+    };
+  }
+
+  if (contieneAlguna(lower, ['perfil', 'cuenta', 'sesion'])) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.perfil_cuenta, contextoActual).texto),
+      tema: 'guia_perfil_cuenta',
+    };
+  }
+
+  if (contieneAlguna(lower, ['chat', 'kai', 'reaccion', 'deslizar', 'rayo'])) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.chat_kai, contextoActual).texto),
+      tema: 'guia_chat_kai',
+    };
+  }
+
+  if (
+    contieneAlguna(lower, [
+      'la app',
+      'aplicacion',
+      'hydrointelligent',
+      'hydrohome',
+      'hydro home',
+      'funciones',
+      'usar esto',
+      'funciona todo',
+    ])
+  ) {
+    return {
+      text: interpolar(elegirSinRepetir(BANCO_GUIAS_APP.general_app, contextoActual).texto),
+      tema: 'guia_general_app',
+    };
+  }
+
+  return null;
+};
+
+// ============================================================================
 // FORMATEADORES DE TELEMETRÍA CONVERSACIONAL
 // ============================================================================
 
@@ -428,9 +935,9 @@ export const procesarConversacionNatural = (
   // 1. MEMORIA MULTI-TURNO: RESPUESTAS CORTAS ("sí", "no", "otro", "por qué", etc.)
   // --------------------------------------------------------------------------
   const esAfirmacionCorta =
-    /^(si|simon|va|sale|dale|porfa|por favor|claro|a ver|ok|okay|orale|andale|otro|otra|mas|dime|cuentame|va que va|va pues|jalo|echalo)\b/.test(
+    /^(si|simon|va|sale|dale|porfa|por favor|claro|a ver|ok|okay|orale|andale|otro|otra|mas|dime|cuentame|va que va|va pues|jalo|echalo)(\s+(porfa|por favor|mas|pues|ya|claro|dale|otro|otra))?$/.test(
       lower
-    ) && lower.length <= 36;
+    );
 
   const esNegacionCorta =
     /^(no|nel|nop|nope|asi esta bien|no gracias|luego|despues|paso|nada|ahorita no)\b/.test(
@@ -438,9 +945,9 @@ export const procesarConversacionNatural = (
     ) && lower.length <= 32;
 
   const esPreguntaSeguimiento =
-    /^(por que|porque|y por que|como|como asi|en serio|neta|y eso|cual|cuales|explica)\b/.test(
+    /^(por que|porque|y por que|como|como asi|en serio|neta|y eso|cual|cuales|explica)(\s*[?!.]*)?$/.test(
       lower
-    ) && lower.length <= 36;
+    );
 
   if (esNegacionCorta && ultimaPregunta) {
     return responder(
@@ -517,7 +1024,20 @@ export const procesarConversacionNatural = (
   }
 
   // --------------------------------------------------------------------------
-  // 2. DESPEDIDAS Y AGRADECIMIENTOS
+  // --------------------------------------------------------------------------
+  // 2. GUÍAS FUNCIONALES PASO A PASO DE HYDROINTELLIGENT (ALTA PRIORIDAD)
+  // --------------------------------------------------------------------------
+  const guiaApp = resolverGuiaApp(lower, contextoActual, datos);
+  if (guiaApp) {
+    return responder(guiaApp.text, {
+      tema: guiaApp.tema,
+      pregunta: guiaApp.tema === 'guia_bomba' ? 'ofrecer_bomba' : null,
+      widgetTipo: null,
+    });
+  }
+
+  // --------------------------------------------------------------------------
+  // 3. DESPEDIDAS Y AGRADECIMIENTOS
   // --------------------------------------------------------------------------
   if (
     contieneAlguna(lower, [
@@ -835,16 +1355,16 @@ export const procesarConversacionNatural = (
 
   if (contieneAlguna(lower, ['excel', 'exportar', 'descargar', 'xlsx', 'hoja de calculo'])) {
     const bancoExcel = [
-      '¡Claro! Para bajar tu historial en Excel (.xlsx), date una vuelta por la pestaña de Reportes o Historial de Consumo y ahí tienes el botón directo de exportación.',
-      'Fíjate que puedes descargar todo tu registro de litros y fechas en Excel desde la sección de Reportes. ¡Queda súper ordenado!',
-      'Si ocupas el archivo de Excel para llevar cuentas o compartirlo, entra a Reportes y pícale a Exportar. Aquí abajo te dejo el acceso rápido a consumo.',
-      '¡Va que va! Los reportes en Excel se generan directo desde la vista de Reportes con tus datos reales de consumo.',
-      'Échale un ojo a la vista de Reportes en el menú; ahí puedes filtrar por periodo y bajar tu Excel en un clic.',
-      '¿Necesitas respaldar tus datos en Excel? Desde Reportes lo descargas de volada sin complicarte.',
-      'Aquí tienes un resumen de flujo actual, y si quieres el Excel completo, lo encuentras en el módulo de Reportes.',
-      'Súper práctico bajar el Excel para ver picos de gasto por semana. Lo tienes listo en la sección de Reportes.',
-      'Con gusto te guío: ve a Reportes -> elige el rango de fechas -> Exportar Excel, ¡y listo!',
-      'Tu historial completo se puede exportar a .xlsx cuando quieras desde la pestaña de Reportes.',
+      '¡Claro! Para bajar tu historial en Excel (.xlsx), ve a la pestaña "Perfil" (abajo a la derecha), entra a la sección "General" y toca "Descargar Bitácora (.xlsx)".',
+      'Fíjate que puedes descargar todo tu registro de lecturas y telemetría en Excel directo desde "Perfil → General → Descargar Bitácora (.xlsx)". ¡Queda súper ordenado!',
+      'Si ocupas el archivo de Excel para llevar cuentas o compartirlo, toca "Perfil" en la barra inferior y pícale a "Descargar Bitácora (.xlsx)". Aquí abajo te dejo tu pulso actual de consumo.',
+      '¡Va que va! El botón para exportar tu bitácora a .xlsx está directo en "Perfil → General → Descargar Bitácora (.xlsx)".',
+      'Échale un ojo a la pestaña "Perfil"; justo en el bloque "General" tienes "Descargar Bitácora (.xlsx)" para bajar tu Excel en un clic.',
+      '¿Necesitas respaldar tus datos en Excel? Desde "Perfil → General → Descargar Bitácora (.xlsx)" lo descargas de volada sin complicarte.',
+      'Aquí tienes un resumen de flujo actual, y si quieres el Excel completo, lo descargas en "Perfil → Descargar Bitácora (.xlsx)".',
+      'Súper práctico bajar el Excel para ver picos de gasto por semana. Lo tienes listo en "Perfil → General → Descargar Bitácora (.xlsx)".',
+      'Con gusto te guío: barra inferior "Perfil" -> sección "General" -> "Descargar Bitácora (.xlsx)", ¡y listo!',
+      'Tu historial completo se puede exportar a .xlsx cuando quieras desde "Perfil → General → Descargar Bitácora (.xlsx)".',
     ];
     const resp = elegirSinRepetir(bancoExcel, contextoActual).texto;
     return responder(resp, {

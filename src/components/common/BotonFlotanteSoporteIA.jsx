@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import {
   useRive,
   Layout,
@@ -6,6 +6,7 @@ import {
   Alignment,
   StateMachineInputType,
 } from '@rive-app/react-canvas';
+import { AppleEmojiText } from './AppleEmoji';
 
 const FRASES_AYUDA_APP_MX = [
   '¿No sabes cómo vincular tu sensor ESP32? ¡Tócame y te explico! 📡',
@@ -32,7 +33,7 @@ let ultimaFraseAppMostrada = '';
 
 const obtenerFraseAppAleatoria = (anterior) => {
   const referencia = anterior || ultimaFraseAppMostrada;
-  let nueva = '';
+  let nueva;
   do {
     nueva =
       FRASES_AYUDA_APP_MX[
@@ -54,12 +55,13 @@ export const BotonFlotanteSoporteIA = ({
 }) => {
   const [isFadingOut, setIsFadingOut] = useState(false);
   const [showBubble, setShowBubble] = useState(true);
-  const [riveInputs, setRiveInputs] = useState([]);
   const [fraseActual, setFraseActual] = useState(() =>
     obtenerFraseAppAleatoria()
   );
 
+  const riveInputsRef = useRef([]);
   const clickTimeoutRef = useRef(null);
+  const bubbleTimerRef = useRef(null);
   const isFirstMountRef = useRef(true);
 
   const { rive, RiveComponent } = useRive({
@@ -78,7 +80,7 @@ export const BotonFlotanteSoporteIA = ({
         const mainSM = smNames[0];
         rive.play(mainSM);
         const inputs = rive.stateMachineInputs(mainSM) || [];
-        setRiveInputs(inputs);
+        riveInputsRef.current = inputs;
       }
     },
   });
@@ -91,7 +93,7 @@ export const BotonFlotanteSoporteIA = ({
       const mainSM = smNames[0];
       rive.play(mainSM);
       const inputs = rive.stateMachineInputs(mainSM) || [];
-      setRiveInputs(inputs);
+      riveInputsRef.current = inputs;
       inputs.forEach((input) => {
         if (input.type === StateMachineInputType.Boolean) {
           input.value = false;
@@ -104,39 +106,44 @@ export const BotonFlotanteSoporteIA = ({
 
   // Ciclo de vida temporal (10,000ms) al abrir la app y al cambiar de pestaña o apartado
   useEffect(() => {
+    if (bubbleTimerRef.current) clearTimeout(bubbleTimerRef.current);
+
+    let initTimer;
     if (isFirstMountRef.current) {
       isFirstMountRef.current = false;
-      setShowBubble(true);
-    } else if (activeTab === 0 && botStage === 'home' && !subView) {
-      setFraseActual((anterior) => obtenerFraseAppAleatoria(anterior));
-      setShowBubble(true);
+      initTimer = setTimeout(() => setShowBubble(true), 0);
+    } else if (botStage === 'home' && subView !== 'chat') {
+      initTimer = setTimeout(() => {
+        setFraseActual((anterior) => obtenerFraseAppAleatoria(anterior));
+        setShowBubble(true);
+      }, 0);
     } else {
-      setShowBubble(false);
-      return undefined;
+      initTimer = setTimeout(() => setShowBubble(false), 0);
+      return () => clearTimeout(initTimer);
     }
 
-    const timer = setTimeout(() => {
+    bubbleTimerRef.current = setTimeout(() => {
       setShowBubble(false);
     }, 10000);
 
     return () => {
-      clearTimeout(timer);
+      clearTimeout(initTimer);
+      if (bubbleTimerRef.current) clearTimeout(bubbleTimerRef.current);
     };
   }, [activeTab, subView, botStage]);
 
   useEffect(() => {
     return () => {
-      if (clickTimeoutRef.current) {
-        clearTimeout(clickTimeoutRef.current);
-      }
+      if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current);
+      if (bubbleTimerRef.current) clearTimeout(bubbleTimerRef.current);
     };
   }, []);
 
-  const handleClick = () => {
+  const triggerOpenChat = useCallback(() => {
     if (isFadingOut) return;
 
     // Dispara reacción visual rápida antes de desmontar
-    riveInputs.forEach((input) => {
+    riveInputsRef.current.forEach((input) => {
       if (input.type === StateMachineInputType.Trigger) {
         input.fire();
       } else if (input.type === StateMachineInputType.Boolean) {
@@ -148,30 +155,36 @@ export const BotonFlotanteSoporteIA = ({
     clickTimeoutRef.current = setTimeout(() => {
       if (onClick) onClick();
     }, 300);
+  }, [isFadingOut, onClick]);
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      triggerOpenChat();
+    }
   };
 
   return (
     <div
-      className={`fixed bottom-24 right-4 z-40 flex flex-col items-end transition-all duration-300 ${
+      onMouseEnter={() => setShowBubble(true)}
+      className={`fixed bottom-24 right-4 z-40 select-none transition-opacity duration-300 ${
         isFadingOut
-          ? 'opacity-0 scale-90 pointer-events-none'
-          : 'opacity-100 scale-100'
+          ? 'opacity-0 pointer-events-none'
+          : 'opacity-100'
       }`}
     >
-      {/* Globo de Diálogo Tipo Cómic con contorno multicolor animado (.animate-hydro-glow) */}
+      {/* Globo de Diálogo Tipo Cómic alineado a la derecha */}
       <div
-        onClick={handleClick}
+        onClick={triggerOpenChat}
         role="button"
         tabIndex={showBubble ? 0 : -1}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') handleClick();
-        }}
+        onKeyDown={handleKeyDown}
         aria-hidden={!showBubble}
-        aria-label={`Abrir HydroBot IA: ${fraseActual}`}
-        className={`relative mb-3 mr-1 transition-all duration-300 origin-bottom-right ${
+        aria-label={`Abrir Kai: ${fraseActual}`}
+        className={`absolute right-0 bottom-full mb-2.5 origin-bottom-right w-max max-w-[225px] transition-opacity duration-200 ${
           showBubble
-            ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto cursor-pointer'
-            : 'opacity-0 scale-95 translate-y-2 pointer-events-none'
+            ? 'opacity-100 pointer-events-auto cursor-pointer'
+            : 'opacity-0 pointer-events-none'
         }`}
       >
         <div className="relative rounded-2xl rounded-br-sm hover:scale-[1.03] active:scale-95 transition-transform">
@@ -196,29 +209,31 @@ export const BotonFlotanteSoporteIA = ({
 
             {/* Interior adaptativo Modo Claro / Modo Oscuro de alto contraste */}
             <div className="relative rounded-[14px] rounded-br-[2px] bg-white/95 dark:bg-[#0f172a]/95 text-slate-800 dark:text-white px-4 py-2.5 max-w-[215px] text-xs sm:text-sm font-medium leading-snug backdrop-blur-md">
-              {fraseActual}
+              <AppleEmojiText text={fraseActual} size={15} />
             </div>
           </div>
         </div>
 
-        {/* Pico triangular inferior derecho sincronizado con el tema y contorno luminoso */}
+        {/* Pico triangular inferior alineado sobre la bolita */}
         <div className="flex justify-end pr-6 -mt-[1px] relative z-10">
           <div className="w-3.5 h-3.5 rotate-45 bg-white dark:bg-[#0f172a] border-r-2 border-b-2 border-cyan-400 shadow-[2px_2px_8px_rgba(6,182,212,0.35)] -mt-2" />
         </div>
       </div>
 
-      {/* Botón Circular Flotante (FAB) con Animación Rive */}
+      {/* Botón Circular Flotante (FAB) Estático con Animación Rive */}
       <button
         type="button"
-        onClick={handleClick}
-        aria-label="Abrir Soporte IA"
-        title="Soporte IA"
-        className="w-20 h-20 rounded-full overflow-hidden flex items-center justify-center bg-[#1a0b2e] border-2 border-purple-500/40 shadow-[0_8px_30px_rgba(124,58,237,0.5)] hover:scale-105 active:scale-95 transition-transform cursor-pointer p-0"
+        onClick={triggerOpenChat}
+        aria-label="Abrir chat con Kai"
+        title="Kai · Toca para abrir"
+        className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center bg-[#1a0b2e] border-2 border-purple-500/40 shadow-[0_8px_30px_rgba(124,58,237,0.5)] hover:scale-105 active:scale-95 transition-transform cursor-pointer select-none p-0"
       >
-        <div className="w-full h-full scale-[2.85] transform-gpu flex items-center justify-center pointer-events-none">
+        <div className="w-full h-full flex items-center justify-center rounded-full overflow-hidden scale-[2.3] transform-gpu pointer-events-none">
           <RiveComponent className="w-full h-full pointer-events-none" />
         </div>
       </button>
     </div>
   );
 };
+
+export default BotonFlotanteSoporteIA;

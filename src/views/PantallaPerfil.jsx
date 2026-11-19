@@ -51,7 +51,7 @@ export const PantallaPerfil = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-white dark:bg-[#0F1722] rounded-t-[36px] min-h-[calc(100dvh-120px)] p-6 sm:p-8 shadow-xl pb-28">
+    <div className="flex-1 flex flex-col bg-white dark:bg-[#0F1722] rounded-t-[36px] p-6 sm:p-8 pb-24 shadow-xl">
       {/* Información del Perfil Central */}
       <div className="flex flex-col items-center justify-center pt-2 pb-6 border-b border-slate-100 dark:border-slate-800">
         <AvatarUsuario size="xl" />

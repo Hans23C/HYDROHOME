@@ -176,7 +176,7 @@ export const PantallaEditarAvatar = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col justify-between bg-white dark:bg-[#0B1726] rounded-t-[36px] min-h-[calc(100dvh-120px)] p-6 sm:p-8 shadow-xl pb-24 transition-colors">
+    <div className="flex-1 flex flex-col justify-between bg-white dark:bg-[#0B1726] rounded-t-[36px] p-6 sm:p-8 shadow-xl pb-24 transition-colors">
       <form onSubmit={handleSave} className="space-y-4 sm:space-y-5">
         {/* Foto de Perfil Squircle con Icono de Cámara central */}
         <InsigniaAvatarPerfil onOpenSelector={onOpenAvatarSelector} />

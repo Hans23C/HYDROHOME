@@ -63,6 +63,7 @@ html.dark,
     margin: 0;
     padding: 0;
     overflow-x: hidden;
+    overscroll-behavior-y: none;
     scrollbar-width: none;
   }
 
@@ -79,6 +80,7 @@ html.dark,
     margin: 0;
     padding: 0;
     overflow-x: hidden;
+    overscroll-behavior-y: none;
     transition: background-color 0.25s ease, color 0.25s ease;
     line-height: 1.6;
     scrollbar-width: none;
@@ -90,6 +92,7 @@ html.dark,
     margin: 0;
     padding: 0;
     overflow-x: hidden;
+    overscroll-behavior-y: none;
   }
 
   body::-webkit-scrollbar {

@@ -100,7 +100,7 @@ export const PantallaAgregarSistemaOContrasena = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col justify-between bg-white dark:bg-[#0B1726] rounded-t-[36px] min-h-[calc(100dvh-120px)] p-6 sm:p-8 shadow-xl pb-16 transition-colors">
+    <div className="flex-1 flex flex-col justify-between bg-white dark:bg-[#0B1726] rounded-t-[36px] p-6 sm:p-8 shadow-xl pb-24 transition-colors">
       <div>
         {/* Selector de Modo: Password (Diseño Fiel) vs Enlazar Sistema IoT (Lógica Fiel) */}
         <div className="flex items-center justify-center p-1 rounded-2xl bg-slate-100 dark:bg-slate-800/80 mb-5 max-w-xs mx-auto">
